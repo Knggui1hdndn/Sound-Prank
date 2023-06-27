@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import java.lang.Exception
@@ -36,8 +37,8 @@ class OffOrHotAdapter(
 
         @SuppressLint("UseCompatLoadingForDrawables")
         fun bind(mDataImage: DataSound) {
-            Picasso.get().load(mDataImage.image).into(img)
-            val picasso = Picasso.get().load(mDataImage.image)
+            Utilities.loadImg(mDataImage.image,img)
+             val picasso = Picasso.get().load(mDataImage.image)
             var bitmapp: Bitmap? =null
              picasso.into(object : Target {
                 override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
