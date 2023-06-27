@@ -1,6 +1,8 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -8,65 +10,142 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.pranksound.fartsound.trollandjoke.funnyapp.ApiClient
+import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ItemSoundBinding
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
 import com.squareup.picasso.Picasso
+import kotlin.properties.Delegates
 
-class ParentSoundAdapter(val list: List<DataImage>, val presenter: ApiClientPresenter) :
-    RecyclerView.Adapter<ParentSoundAdapter.ParentSoundViewHolder>() {
+interface RecyclerView {
+    fun itemClick(triple: Triple<DataImage, Boolean, List<DataSound>>, position: Int)
+}
+
+class ParentSoundAdapter(
+    var lists: List<Triple<DataImage, Boolean, List<DataSound>>>,
+    val presenter: ApiClientPresenter,
+    val click: com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.RecyclerView,
+
+    ) : RecyclerView.Adapter<ParentSoundAdapter.ParentSoundViewHolder>() {
 
     inner class ParentSoundViewHolder(val binding: ItemSoundBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root), ChildSoundClickListens {
+        private var childAdapter: ChildSoundAdapter? = null
+        private lateinit var mDataImage: DataImage
+        private lateinit var context: Context
+        private var isChecked by Delegates.notNull<Boolean>()
 
-        fun bind(dataImage: DataImage) {
-            Picasso.get().load(dataImage.icon).into(binding.imgParentSound)
-            binding.txtTitleParent.text = dataImage.name
-            binding.mRcy.visibility=View.VISIBLE
+        fun bind(triple: Triple<DataImage, Boolean, List<DataSound>>, position: Int) {
+            val mDataImage = triple.first
+            isChecked = triple.second
+            val listDataSound = triple.third
+            this.mDataImage = mDataImage
+            context = binding.root.context
 
-            setChildAdapter(binding.root.context, dataImage.id)
-            binding.mCheck.setOnCheckedChangeListener { buttonView, isChecked ->
-                Log.d("sssssssssss",isChecked.toString())
 
-//                binding.mRcy.visibility = if (isChecked) {
-//                    setChildAdapter(buttonView.context, dataImage.id)
-//                    View.VISIBLE
-//                } else View.INVISIBLE
+            Picasso.get().load(mDataImage.icon).into(binding.imgParentSound)
+            binding.txtTitleParent.text = mDataImage.name
+            binding.mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
+
+            if (isChecked && listDataSound.isNotEmpty()) {
+                showChildSound(listDataSound, mDataImage, isChecked, position)
+            }
+
+            binding.mLiner.setOnClickListener {
+                isChecked = !isChecked
+                binding.mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
+                if (isChecked) {
+                    showChildSound(listDataSound, mDataImage, isChecked, position)
+                }
             }
         }
 
-        private fun setChildAdapter(context: Context, id: String) {
+        fun clearChildAdapter() {
+            childAdapter = null
+        }
+
+        private fun showChildSound(
+            listDataSound: List<DataSound>,
+            mDataImage: DataImage,
+            isChecked: Boolean, position: Int
+        ) {
+            childAdapter=null
+            if (listDataSound.isNotEmpty()) {
+                setChildAdapter(listDataSound);
+                binding.mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
+                click.itemClick(Triple(mDataImage, isChecked, listDataSound), position)
+            } else {
+                setChildAdapter(mDataImage.id) {
+                    binding.mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
+                    click.itemClick(Triple(mDataImage, isChecked, it), position)
+                }
+            }
+        }
+
+        @SuppressLint("SuspiciousIndentation")
+        private fun setChildAdapter(id: String, call: (List<DataSound>) -> Unit) {
             var adapter: ChildSoundAdapter? = null
             val lmg = GridLayoutManager(context, 4)
-            if (adapter == null) {
-                presenter.getListChildSound(id, object : ApiClientContract.Listens {
-                    override fun onSuccess(list: List<Any>) {
-                        binding.mProgress.visibility = View.GONE
-                        binding.mRcy.layoutManager = lmg
-                        adapter = ChildSoundAdapter(list as List<DataSound>)
-                        binding.mRcy.adapter = adapter
-                    }
+            presenter.getListChildSound(id, object : ApiClientContract.Listens {
+                override fun onSuccess(list: List<Any>) {
+                    binding.mProgress.visibility = View.GONE
+                    binding.mRcy.layoutManager = lmg
+                    adapter = ChildSoundAdapter(list as List<DataSound>, this@ParentSoundViewHolder)
+                    binding.mRcy.adapter = adapter
+                    call(list)
+                }
 
-                    override fun onFailed(e: String) {
-                        Toast.makeText(context, e, Toast.LENGTH_SHORT).show()
-                    }
-                })
+                override fun onFailed(e: String) {
+                    Toast.makeText(context, e, Toast.LENGTH_SHORT).show()
+                    isChecked = !isChecked
+                }
+            })
+        }
+
+        private fun setChildAdapter(list: List<DataSound>) {
+            if (childAdapter == null) {
+                if (list.isNotEmpty()) {
+                    val lmg = GridLayoutManager(context, 4)
+                    childAdapter = ChildSoundAdapter(list, this)
+                    binding.mRcy.layoutManager = lmg
+                    binding.mRcy.adapter = childAdapter
+                }
             }
         }
+
+        override fun itemClick(position: Int) {
+            val context = binding.root.context
+            val intent = Intent(context, Show::class.java)
+            intent.putExtra(Constraints.SOUND_CHILD_CLICK, position)
+            Log.d("clickkkkkkkkkkkkk",position.toString())
+            intent.putExtra(Constraints.PARENT_SOUND, mDataImage)
+            context.startActivity(intent)
+        }
+    }
+
+    fun setData(lists: List<Triple<DataImage, Boolean, List<DataSound>>>) {
+        this.lists = lists
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParentSoundViewHolder {
-        return ParentSoundViewHolder(ItemSoundBinding.inflate(LayoutInflater.from(parent.context)))
+        return ParentSoundViewHolder(
+            ItemSoundBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
+        )
     }
 
     override fun getItemCount(): Int {
-        return list.size
+        return lists.size
     }
 
     override fun onBindViewHolder(holder: ParentSoundViewHolder, position: Int) {
-        holder.bind(list[position])
+        holder.clearChildAdapter()
+        holder.bind(lists[position], position)
+
     }
 }

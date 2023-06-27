@@ -3,6 +3,12 @@
     <string name="text_splash">Let our  amusing s
 bring smile to your face.
     </string>
-
+    <string name="today_tot_sound">
+    Today’s Hot Sound
+</string>
+    <string name="play_offline">
+Play Offline</string>
+    <string name="online_sound">
+Online Sound</string>
 
 </resources>
