@@ -10,5 +10,13 @@ bring smile to your face.
 Play Offline</string>
     <string name="online_sound">
 Online Sound</string>
+    <string-array name="time">
+        <item>10s</item>
+        <item>15s</item>
+        <item>30s</item>
+        <item>1m</item>
+        <item>3m</item>
+        <item>5m</item>
+    </string-array>
 
 </resources>

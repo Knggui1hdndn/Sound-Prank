@@ -20,7 +20,7 @@ import java.lang.Exception
 
 
 interface OffOrHotAdapterListens {
-    fun itemClick(bitmap: Bitmap, linkSound: String, checkFirst:Boolean)
+    fun itemClick(bitmap: Bitmap, linkSound: String, checkFirst: Boolean)
 }
 
 class OffOrHotAdapter(
@@ -37,28 +37,14 @@ class OffOrHotAdapter(
 
         @SuppressLint("UseCompatLoadingForDrawables")
         fun bind(mDataImage: DataSound) {
-            Utilities.loadImg(mDataImage.image,img)
-             val picasso = Picasso.get().load(mDataImage.image)
-            var bitmapp: Bitmap? =null
-             picasso.into(object : Target {
-                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+            Utilities.loadImg(mDataImage.image, img)
 
-
-
-                }
-
-                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-
-                }
-
-                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-
-                }
-
-            })
             mView.setOnClickListener {
-                offOrHotAdapterListens.itemClick((img.drawable as BitmapDrawable).bitmap,mDataImage.source,false)
-
+                offOrHotAdapterListens.itemClick(
+                    (img.drawable as BitmapDrawable).bitmap,
+                    mDataImage.source,
+                    false
+                )
             }
 
         }
