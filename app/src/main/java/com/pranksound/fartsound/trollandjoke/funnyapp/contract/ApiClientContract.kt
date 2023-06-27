@@ -11,7 +11,7 @@ interface ApiClientContract {
         
     }
     interface Listens {
-        fun onSuccess(list:List<Objects>)
+        fun onSuccess(list: List<Any >)
         fun onFailed(e:String)
     }
 
