@@ -9,10 +9,32 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSounds
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
+import java.io.InputStream
 import java.util.Objects
+import java.util.function.BinaryOperator
 
 
 class ApiClientPresenter() : ApiClientContract.Presenter {
+    override fun downloadSound(url: String, callback: (InputStream?) -> Unit) {
+        ApiClient.apiInterface.downloadSound(url)
+            .enqueue(object : retrofit2.Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
+                    if (response.isSuccessful) callback(
+                        response.body()!!.byteStream()
+                    ) else callback(null)
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    callback(null)
+                }
+
+            })
+    }
+
+
     override fun getListChildSound(
         id: String,
         listens: ApiClientContract.Listens
@@ -23,6 +45,7 @@ class ApiClientPresenter() : ApiClientContract.Presenter {
                     call: Call<DataSounds>,
                     response: Response<DataSounds>
                 ) {
+
                     if (response.isSuccessful) response.let { listens.onSuccess(it.body()!!.data) }
                 }
 
@@ -40,7 +63,7 @@ class ApiClientPresenter() : ApiClientContract.Presenter {
                     call: Call<DataImages>,
                     response: Response<DataImages>
                 ) {
-                    if (response.isSuccessful) response.body()?.let { listens.onSuccess(it.data ) }
+                    if (response.isSuccessful) response.body()?.let { listens.onSuccess(it.data) }
                 }
 
                 override fun onFailure(call: Call<DataImages>, t: Throwable) {

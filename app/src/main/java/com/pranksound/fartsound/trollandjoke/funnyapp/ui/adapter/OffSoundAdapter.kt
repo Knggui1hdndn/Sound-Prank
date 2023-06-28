@@ -37,7 +37,7 @@ class OffOrHotAdapter(
 
         @SuppressLint("UseCompatLoadingForDrawables")
         fun bind(mDataImage: DataSound) {
-            Utilities.loadImg(mDataImage.image, img)
+            Utilities.setImage(mDataImage.image, img,view.context)
 
             mView.setOnClickListener {
                 offOrHotAdapterListens.itemClick(
@@ -46,7 +46,6 @@ class OffOrHotAdapter(
                     false
                 )
             }
-
         }
     }
 

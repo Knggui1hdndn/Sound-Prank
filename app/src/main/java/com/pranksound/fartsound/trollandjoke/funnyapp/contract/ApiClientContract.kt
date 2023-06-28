@@ -1,8 +1,6 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.contract
 
-import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
-import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
-import java.util.Objects
+import java.io.InputStream
 
 interface ApiClientContract {
     interface View{
@@ -16,7 +14,8 @@ interface ApiClientContract {
     }
 
     interface Presenter{
-        fun getListChildSound(id :String,listens: Listens)
+        fun downloadSound (url:String,callback: (InputStream? )->Unit)
+         fun getListChildSound(id :String,listens: Listens)
         fun getListParentSound(listens: Listens)
     }
 }

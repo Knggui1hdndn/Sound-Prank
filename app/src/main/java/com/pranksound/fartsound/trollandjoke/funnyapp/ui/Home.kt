@@ -13,6 +13,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresent
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.OffOrHotAdapter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ParentSoundAdapter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.RecyclerView
+import java.lang.reflect.Array
 
 class Home : AppCompatActivity(), ApiClientContract.Listens,
     com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.RecyclerView {
@@ -26,20 +27,10 @@ class Home : AppCompatActivity(), ApiClientContract.Listens,
         setContentView(binding.root)
         presenter = ApiClientPresenter()
         presenter.getListParentSound(this)
-        setAdapterHotSound()
-        setAdapterOffLine()
+        val asset= assets.list("Airhorn/sound/")
+        Log.d("okookoksas",asset.contentToString())
     }
 
-    private fun setAdapterHotSound() {
-//        val adapter = OffOrHotAdapter()
-//        val lmg = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-//        binding.mRcy.layoutManager = lmg
-//        binding.mRcy.adapter = adapter
-    }
-
-    private fun setAdapterOffLine() {
-
-    }
 
     override fun onSuccess(list: List<Any>) {
         //ITEM-CHECK-LIST CHILD
@@ -50,16 +41,19 @@ class Home : AppCompatActivity(), ApiClientContract.Listens,
                 mutableListOf<DataSound>()
             )
         }.toList().toMutableList()
+        setAdapter()
+    }
+
+    private fun setAdapter() {
         adapter = ParentSoundAdapter(listHash, presenter, this)
         val lmg = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.mRcy.layoutManager = lmg
         binding.mRcy.adapter = adapter
-
     }
 
     override fun onFailed(e: String) {
         Toast.makeText(this@Home, "Kiểm tra mạng", Toast.LENGTH_SHORT).show()
-
+        setAdapter()
     }
 
     override fun itemClick(triple: Triple<DataImage, Boolean, List<DataSound>>, position: Int) {

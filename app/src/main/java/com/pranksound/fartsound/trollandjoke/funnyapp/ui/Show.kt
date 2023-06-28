@@ -3,9 +3,11 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
+import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.app.AppCompatActivity
@@ -55,10 +57,14 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, OffOrHotAdapterList
         presenter.getListChildSound(mDataImage.id, this)
         with(binding) {
             seekBar.max = showPresenter.getMaxVolume()
+            seekBar.progress = showPresenter.getCurrentVolume()
             seekBar.setOnSeekBarChangeListener(this@Show)
             btnNext.setOnClickListener { showPresenter.nextItem() }
-
+            swLoop.setOnClickListener { showPresenter.setLooping(swLoop.isChecked) }
+            btnTime.setOnClickListener { showPresenter.clickMenuPopup() }
             btnPre.setOnClickListener { showPresenter.prevItem() }
+            img.setOnClickListener { showPresenter.playMusic(list[currentPosition].source) }
+            registerForContextMenu(btnTime)
 
             mRcy.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageScrolled(
@@ -69,9 +75,21 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, OffOrHotAdapterList
                 }
             })
         }
-
     }
 
+    override fun showMenuPopup() {
+        val popupMenu = PopupMenu(this, binding.btnTime)
+        val menu = popupMenu.menu
+        val list = resources.getStringArray(R.array.time)
+        list.forEach {
+            menu!!.add(0, 0, 0, it)
+        }
+        popupMenu.setOnMenuItemClickListener {
+            showPresenter.clickItemMenuPopup(list.indexOf(it.title))
+            true
+        }
+        popupMenu.show()
+    }
 
     private fun setImage() {
         val url = this.list[currentPosition].image
@@ -93,6 +111,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, OffOrHotAdapterList
         showPresenter = ShowPresenter(this, this, this.list.size)
         setImage()
         setAdapter()
+
     }
 
     private fun setAdapter() {
@@ -118,54 +137,29 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, OffOrHotAdapterList
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        showPresenter.pauseMusic()
+    }
+
     override fun loadSuccess() {
-        TODO("Not yet implemented")
+        binding.mProgress.visibility = View.INVISIBLE
     }
 
     override fun load() {
-        TODO("Not yet implemented")
+        binding.mProgress.visibility = View.VISIBLE
+
     }
 
     override fun loadFailed(e: String) {
-        TODO("Not yet implemented")
+        binding.mProgress.visibility = View.INVISIBLE
+        Log.d("ssssssss", e)
     }
 
-    override fun pauseMusic() {
-        TODO("Not yet implemented")
-    }
-
-    override fun adjustVolume(volume: Float) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setFavorite(isFavorite: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setRepeatInterval(intervalSeconds: Int) {
-        TODO("Not yet implemented")
-    }
 
     override fun showCurrentItem(int: Int) {
-        binding.mRcy.setCurrentItem(currentPosition, false)
+        binding.mRcy.setCurrentItem(int, false)
         setImage()
-    }
-
-    override fun onCreateContextMenu(
-        menu: ContextMenu?,
-        v: View?,
-        menuInfo: ContextMenu.ContextMenuInfo?
-    ) {
-        resources.getStringArray(R.array.time).forEach {
-            menu!!.add(0, v!!.id, 0, it)
-        }
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        val title = item.title
-        showPresenter.setRepeatInterval(title!!.filter { it.isDigit() }.toString().toInt())
-
-        return true
     }
 
 

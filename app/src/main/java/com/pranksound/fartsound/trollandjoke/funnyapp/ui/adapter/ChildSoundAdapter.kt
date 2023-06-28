@@ -6,21 +6,24 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ItemChildSoundBinding
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
 import com.squareup.picasso.Picasso
 
-interface ChildSoundClickListens{
+interface ChildSoundClickListens {
     fun itemClick(position: Int)
 }
-class ChildSoundAdapter(private val list: List<DataSound>,private val childSoundClickListens:ChildSoundClickListens) :
+
+class ChildSoundAdapter(
+    private val list: List<DataSound>,
+    private val childSoundClickListens: ChildSoundClickListens
+) :
     RecyclerView.Adapter<ChildSoundAdapter.ChildSoundViewHolder>() {
-  inner  class ChildSoundViewHolder(val binding: ItemChildSoundBinding) :
+    inner class ChildSoundViewHolder(val binding: ItemChildSoundBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(dataImage: DataSound, position: Int,) {
-            Picasso.get().load(dataImage.image).fit().into(binding.imageView)
+        fun bind(dataSound: DataSound, position: Int) {
+            Utilities.setImage(dataSound.image, binding.imageView, binding.root.context)
             binding.imageView.setOnClickListener {
                 childSoundClickListens.itemClick(position)
-                Log.d("clickkkkkkkkkkkkk",position.toString())
-
             }
         }
     }
@@ -40,6 +43,6 @@ class ChildSoundAdapter(private val list: List<DataSound>,private val childSound
     }
 
     override fun onBindViewHolder(holder: ChildSoundViewHolder, position: Int) {
-        holder.bind(list[position],position)
+        holder.bind(list[position], position)
     }
 }

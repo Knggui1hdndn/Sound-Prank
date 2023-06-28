@@ -17,6 +17,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
 import com.squareup.picasso.Picasso
 import kotlin.properties.Delegates
 
@@ -43,22 +44,22 @@ class ParentSoundAdapter(
             isChecked = triple.second
             val listDataSound = triple.third
             this.mDataImage = mDataImage
-            context = binding.root.context
+            with(binding){
+                context = root.context
+                Utilities.setImage(mDataImage.icon, imgParentSound,context)
+                txtTitleParent.text = mDataImage.name
+                mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
 
-
-            Picasso.get().load(mDataImage.icon).into(binding.imgParentSound)
-            binding.txtTitleParent.text = mDataImage.name
-            binding.mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
-
-            if (isChecked && listDataSound.isNotEmpty()) {
-                showChildSound(listDataSound, mDataImage, isChecked, position)
-            }
-
-            binding.mLiner.setOnClickListener {
-                isChecked = !isChecked
-                binding.mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
-                if (isChecked) {
+                if (isChecked && listDataSound.isNotEmpty()) {
                     showChildSound(listDataSound, mDataImage, isChecked, position)
+                }
+
+                mLiner.setOnClickListener {
+                    isChecked = !isChecked
+                    mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
+                    if (isChecked) {
+                        showChildSound(listDataSound, mDataImage, isChecked, position)
+                    }
                 }
             }
         }
@@ -72,7 +73,7 @@ class ParentSoundAdapter(
             mDataImage: DataImage,
             isChecked: Boolean, position: Int
         ) {
-            childAdapter=null
+            childAdapter = null
             if (listDataSound.isNotEmpty()) {
                 setChildAdapter(listDataSound);
                 binding.mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
@@ -120,7 +121,7 @@ class ParentSoundAdapter(
             val context = binding.root.context
             val intent = Intent(context, Show::class.java)
             intent.putExtra(Constraints.SOUND_CHILD_CLICK, position)
-            Log.d("clickkkkkkkkkkkkk",position.toString())
+            Log.d("clickkkkkkkkkkkkk", position.toString())
             intent.putExtra(Constraints.PARENT_SOUND, mDataImage)
             context.startActivity(intent)
         }
