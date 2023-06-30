@@ -2,17 +2,12 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.ContextMenu
-import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -47,26 +42,18 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
 
     }
 
-    private lateinit var list: List<DataSound>
+    private lateinit var list: MutableList<DataSound>
     private lateinit var binding: ActivityShowBinding
     private lateinit var showPresenter: ShowPresenter
     private lateinit var apiClientPresenter: ApiClientPresenter
+    private lateinit var mDataImage: DataImage
     private var currentPosition = 0
+    private var check = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityShowBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        apiClientPresenter = ApiClientPresenter()
-        val mDataImage = getDataImage()
-        list = mutableListOf()
-
-        showPresenter = ShowPresenter(this, this, 0, apiClientPresenter)
-        if (ListensChangeNetwork.isConnectNetwork == Constraints.DISCONNECT_NETWORK) {
-            list = FileHandler.getFileAssetByParentSound(this, mDataImage.name)
-        } else {
-            apiClientPresenter.getListChildSound(mDataImage.id, this)
-        }
-
+        setUpActivity()
         with(binding) {
             seekBar.max = showPresenter.getMaxVolume()
             seekBar.progress = showPresenter.getCurrentVolume()
@@ -77,8 +64,18 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
             btnPre.setOnClickListener { showPresenter.prevItem() }
             img.setOnClickListener { showPresenter.playMusic(list[currentPosition].source) }
             imgDowload.setOnClickListener {
-                 showPresenter.downLoad(mDataImage, list[currentPosition])
+                showPresenter.downLoad(mDataImage, list[currentPosition])
                 imgDowload.isEnabled = false
+                binding.mProgress1.visibility = View.VISIBLE
+            }
+            cbFavourite.setOnClickListener {
+                with(FileHandler) {
+                    if (check == Constraints.CONNECTION_NETWORK) {
+                        saveFavoriteOnl(list[currentPosition], this@Show)
+                    } else {
+                        saveFavoriteOff(list[currentPosition], this@Show)
+                    }
+                }
             }
             registerForContextMenu(btnTime)
             mRcy.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -88,22 +85,57 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
                 ) {
                     currentPosition = position
                     showPresenter.currentPosition = currentPosition
-                    FileHandler.checkFileExists(this@Show, mDataImage.name, currentPosition).let {
-                        with(binding) {
-                            Log.d("kookkokok", it.toString())
-                            if (!it) {
-                                imgDowload.setBackgroundResource(R.drawable.baseline_cloud_download_24)
-
-                            } else {
-                                imgDowload.setBackgroundResource(R.drawable.baseline_cloud_done_24)
-
-                            }
-                        }
-                    }
+                    showPresenter.checkFavorite(check, list[currentPosition].source)
+                    showPresenter.checkDownLoad(mDataImage.name)
                     setImage()
                 }
             })
         }
+    }
+
+    private fun setUpActivity() {
+        binding.mConstraint.isEnabled = false
+        mDataImage = getDataImage()
+        apiClientPresenter = ApiClientPresenter()
+        list = mutableListOf()
+        showPresenter = ShowPresenter(this, this, 0, apiClientPresenter)
+        binding.mConstraint.isEnabled = false
+        val intent = intent
+
+        if (intent.getStringExtra(Constraints.ACTIVITY_LAUNCH) =="Favorite") {
+            currentPosition = intent.getIntExtra(Constraints.SOUND_CHILD_CLICK, 0)
+
+            val checkNetWork =
+                ListensChangeNetwork.isConnectNetwork == Constraints.DISCONNECT_NETWORK
+
+
+            if (checkNetWork) {
+                list.addAll(FileHandler.getFavoriteOff(this))
+                onFailed("e")
+            } else {
+                list.addAll(FileHandler.getFavoriteOnl(this))
+                list.addAll(FileHandler.getFavoriteOff(this))
+                onFailed("e")
+            }
+        } else {
+            mDataImage = getDataImage()
+            val checkNetWork =
+                ListensChangeNetwork.isConnectNetwork == Constraints.DISCONNECT_NETWORK
+            if (checkNetWork) {
+                try {
+                    list = FileHandler.getFileAssetByParentSound(this, mDataImage.name).toMutableList()
+                } catch (e: Exception) {
+                    list =
+                        FileHandler.getDataSoundChildFromInternalStorage(this, mDataImage.name)[0].third.toMutableList()
+                }
+                onFailed("e")
+            } else {
+                apiClientPresenter.getListChildSound(mDataImage.id, this)
+            }
+            check = ListensChangeNetwork.isConnectNetwork
+        }
+
+
     }
 
     override fun showMenuPopup() {
@@ -123,11 +155,28 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
     @SuppressLint("ResourceType", "UseCompatLoadingForDrawables")
     override fun downLoadSuccess() {
         binding.imgDowload.setImageDrawable(getDrawable(R.drawable.baseline_cloud_done_24))
-        binding.imgDowload.isEnabled = true
+        binding.imgDowload.isEnabled = false
+        binding.mProgress1.visibility = View.INVISIBLE
+
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     override fun dowLoadFailed(e: String) {
+        binding.imgDowload.setImageDrawable(getDrawable(R.drawable.baseline_cloud_download_24))
+        binding.imgDowload.isEnabled = true
+        binding.mProgress1.visibility = View.INVISIBLE
+        Utilities.showSnackBar(binding.root, "Lỗi mạng")
+    }
 
+    override fun isFavorite(boolean: Boolean) {
+        binding.cbFavourite.isChecked = boolean
+    }
+
+    override fun isDownload(boolean: Boolean, draw: Int) {
+        with(binding) {
+            imgDowload.setImageResource(draw)
+            imgDowload.isEnabled = boolean
+        }
     }
 
     private fun setImage() {
@@ -146,10 +195,12 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
     }
 
     override fun onSuccess(list: List<Any>) {
-        this.list = list as List<DataSound>
+        this.list = list as MutableList<DataSound>
         showPresenter = ShowPresenter(this, this, this.list.size, apiClientPresenter)
         setImage()
         setAdapter()
+        binding.mProgress1.visibility = View.INVISIBLE
+        binding.mConstraint.isEnabled = true
 
     }
 
@@ -169,6 +220,10 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
 
     override fun onFailed(e: String) {
         setAdapter()
+        binding.mProgress1.visibility = View.INVISIBLE
+        binding.imgDowload.visibility = View.VISIBLE
+        binding.mConstraint.isEnabled = true
+
     }
 
     override fun itemClick(bitmap: Bitmap, linkSound: String, checkFirst: Boolean) {
@@ -191,7 +246,6 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
 
     override fun loadFailed(e: String) {
         binding.mProgress.visibility = View.INVISIBLE
-        Log.d("ssssssss", e)
     }
 
 

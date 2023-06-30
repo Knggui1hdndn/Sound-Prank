@@ -1,10 +1,10 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints.AUTHORITY
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
@@ -13,6 +13,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.lang.StringBuilder
 import java.util.Arrays
 
 
@@ -92,12 +93,13 @@ object FileHandler {
         val list = mutableListOf<Triple<DataImage, Boolean, List<DataSound>>>()
         var parentDirectories = getFolderName(context, null)
         if (byNameParent != null) {
-            parentDirectories = parentDirectories.filter { it == byNameParent }.toMutableList()
+            parentDirectories = parentDirectories.filter { it != byNameParent }.toMutableList()
+            Log.d("plpppppppppssppppppp",parentDirectories.size.toString())
+
         }
         var listDataSound = mutableListOf<DataSound>()
         var imgParentSound = ""
-
-        for (fileNameParent in parentDirectories) {//Lấy các thư mục lớn nhất sau dir
+        for (fileNameParent in parentDirectories) {//Lấy các thư mục lớn nhất sau dirZ
             val directory = File(context.filesDir, fileNameParent)
             val fileChilds = directory.listFiles()
 
@@ -109,7 +111,6 @@ object FileHandler {
                         fileChild
                     ).toString()
                 }
-                Log.d("ddddđaaaaaaaa", imgParentSound)
                 val directoryChild = File(directory, fileChild.name)
                 val fileImgSounds = directoryChild.listFiles()
                 var uriSound: String? = null
@@ -136,18 +137,67 @@ object FileHandler {
                     }
                 }
             }
-            Log.d("ssssssssssssssssssss", imgParentSound)
-
             list.add(Triple(DataImage("0", fileNameParent, imgParentSound), false, listDataSound))
-            Log.d("ssssssssssssssssssss", list[0].first.icon)
-
             listDataSound = mutableListOf<DataSound>()
         }
+        Log.d("plpppppppppppppppp",list.size.toString())
+        Log.d("plpppppppppppppppp",list[0].third.toString())
         return list
     }
 
+
+    fun saveFavoriteOnl(mDataSound: DataSound, context: Context) {
+        saveFavorite(context, mDataSound, Constraints.FAVORITE_ONL)
+    }
+
+    fun saveFavoriteOff(mDataSound: DataSound, context: Context) {
+        saveFavorite(context, mDataSound, Constraints.FAVORITE_Off)
+    }
+
+    private fun saveFavorite(context: Context, mDataSound: DataSound, typeFavorite: String) {
+        val shared = context.getSharedPreferences(typeFavorite, Context.MODE_PRIVATE)
+        val append = StringBuilder()
+        val getFavorite = getFavorite(context, typeFavorite)
+        getFavorite.add(mDataSound)
+        getFavorite.forEach{
+            append.append(it.source + "&&" + it.image + "\n")
+        }
+
+        shared.edit().putString(
+            typeFavorite,
+            append.toString()
+            ).apply()
+    }
+
+    private fun getFavorite(context: Context, typeFavorite: String): MutableList<DataSound> {
+        val shared = context.getSharedPreferences(typeFavorite, Context.MODE_PRIVATE)
+        val mutableList = mutableListOf<DataSound>()
+        val list = shared.getString(typeFavorite, "")
+        val listSplip = list!!.split("\n")
+
+        for (sound in listSplip) {
+            val soundDataSplit = sound.split("&&")
+            if (soundDataSplit.size == 2) {
+                mutableList.add(DataSound(soundDataSplit[0], "false", soundDataSplit[1]))
+            }
+        }
+
+        return mutableList.toMutableList()
+    }
+
+    @SuppressLint("WrongConstant")
+    fun getFavoriteOnl(context: Context): List<DataSound> {
+        return getFavorite(context, Constraints.FAVORITE_ONL)
+    }
+
+    @SuppressLint("WrongConstant")
+    fun getFavoriteOff(context: Context): List<DataSound> {
+        Log.d("iokokosadasd", getFavorite(context, Constraints.FAVORITE_Off).size.toString())
+        return getFavorite(context, Constraints.FAVORITE_Off)
+    }
+
     fun checkFileExists(context: Context, nameParent: String, position: Int): Boolean {
-        return File("/data/data/com.pranksound.fartsound.trollandjoke.funnyapp/files/$nameParent/${nameParent + position}/${nameParent + position}.png").exists()
+        return File("${context.filesDir}/$nameParent/${nameParent + position}/${nameParent + position}.png").exists()
     }
 
     private fun getFolderName(context: Context, nameParent: String?): MutableList<String> {

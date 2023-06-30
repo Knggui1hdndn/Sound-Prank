@@ -7,15 +7,13 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
+import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ShowContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
-import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
-import java.io.InputStream
 
 class ShowPresenter(
     val view: ShowContract.MusicPlayerView,
@@ -26,28 +24,57 @@ class ShowPresenter(
     ShowContract.MusicPlayerPresenter {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private var mediaPlayer = MediaPlayer()
-      var currentPosition = 0
+    var currentPosition = 0
     private var isLooping = false
+    override fun checkFavorite(stateNetWork: String, sound: String) {
+        var isFavorite = false
+        isFavorite = if (stateNetWork == Constraints.CONNECTION_NETWORK) {
+            FileHandler.getFavoriteOnl(context).any { it.source == sound }
+        } else {
+            FileHandler.getFavoriteOff(context).any { it.source == sound }
+        }
+        view.isFavorite(isFavorite)
+    }
+
+    override fun checkDownLoad(nameParentSound: String) {
+        FileHandler.checkFileExists(context, nameParentSound, currentPosition).let {
+            if (!it) {
+                view.isDownload(true, R.drawable.baseline_cloud_download_24)
+
+            } else {
+                view.isDownload(false, R.drawable.baseline_cloud_done_24)
+            }
+        }
+
+    }
+
     override fun downLoad(mImg: DataImage, mSound: DataSound) {
         apiClientPresenter.downloadStream(mSound.source) { sound ->
-            if (sound!=null){
+            if (sound != null) {
                 apiClientPresenter.downloadStream(mImg.icon) { imgParent ->
-                   if (imgParent!=null){
-                       apiClientPresenter.downloadStream(mSound.image) { imgChild ->
-                           if (imgChild!=null){
-                               Toast.makeText(context,"OK",Toast.LENGTH_SHORT).show()
-                               val bitmapImgSound=BitmapFactory.decodeStream(imgParent)
-                               val bitmapImgImage=BitmapFactory.decodeStream(imgChild)
-                               FileHandler.saveImgParentToAppDirectory(context,bitmapImgSound ,mImg.name)
-                               FileHandler.saveImgToAppDirectory(context, bitmapImgImage,mImg.name,mImg.name+currentPosition)
-                               FileHandler.saveFileToAppDirectory(sound ,mImg.name,mImg.name+currentPosition,context)
-                           }else{
-                               view.dowLoadFailed("Kiểm tra mạng")
-                           }
-                       }
-                   }else{
-                       view.dowLoadFailed("Kiểm tra mạng")
-                   }
+                    if (imgParent != null) {
+                        apiClientPresenter.downloadStream(mSound.image) { imgChild ->
+                            if (imgChild != null) {
+                                Toast.makeText(context, "OK", Toast.LENGTH_SHORT).show()
+                                val bitmapImgSound = BitmapFactory.decodeStream(imgParent)
+                                val bitmapImgImage = BitmapFactory.decodeStream(imgChild)
+                                FileHandler.saveImgParentToAppDirectory(
+                                    context, bitmapImgSound, mImg.name
+                                )
+                                FileHandler.saveImgToAppDirectory(
+                                    context, bitmapImgImage, mImg.name, mImg.name + currentPosition
+                                )
+                                FileHandler.saveFileToAppDirectory(
+                                    sound, mImg.name, mImg.name + currentPosition, context
+                                )
+                                view.downLoadSuccess()
+                            } else {
+                                view.dowLoadFailed("Kiểm tra mạng")
+                            }
+                        }
+                    } else {
+                        view.dowLoadFailed("Kiểm tra mạng")
+                    }
                 }
             }else{
                 view.dowLoadFailed("Kiểm tra mạng")
@@ -57,7 +84,6 @@ class ShowPresenter(
 
     override fun setLooping(isLooping: Boolean) {
          this.isLooping=isLooping
-        Log.d("Nguyenkhang",isLooping.toString())
 
     }
 
@@ -75,7 +101,6 @@ class ShowPresenter(
                 0
             }
         }
-        Log.d("Nguyenkhang",repeatInterval.toString())
         setRepeatInterval(repeatInterval)
     }
 
@@ -146,7 +171,6 @@ else->{
     }
 
     override fun playMusicOff(raw: AssetFileDescriptor) {
-        Log.d("sâsssa",raw.toString())
 
         if (mediaPlayer.isPlaying) mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
@@ -161,7 +185,6 @@ else->{
            playMusicOff(check)
        }catch (e:Exception){
            playMusicOnl(url)
-           Log.d("sâsssa",e.toString())
        }
 
     }

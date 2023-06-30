@@ -13,9 +13,13 @@ interface ShowContract {
         fun showMenuPopup()
         fun downLoadSuccess()
         fun dowLoadFailed(e:String)
+        fun isFavorite(boolean: Boolean)
+        fun isDownload(boolean: Boolean,draw:Int)
     }
 
     interface MusicPlayerPresenter {
+        fun checkFavorite(stateNetWork:String,sound:String)
+        fun checkDownLoad(nameParentSound:String)
         fun downLoad(mImg: DataImage, mSound: DataSound)
         fun setLooping(isLooping: Boolean)
         fun clickMenuPopup()

@@ -33,7 +33,6 @@ class ShowChildSoundAdapter(
         @SuppressLint("UseCompatLoadingForDrawables")
         fun bind(mDataImage: DataSound) {
             Utilities.setImage(mDataImage.image, img,view.context)
-
             mView.setOnClickListener {
                 offOrHotAdapterListens.itemClick(
                     (img.drawable as BitmapDrawable).bitmap,

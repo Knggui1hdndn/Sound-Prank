@@ -4,22 +4,28 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.util.Patterns
 import android.view.View
 import android.widget.ImageView
 import androidx.core.net.toUri
 import com.google.android.material.snackbar.Snackbar
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
-import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
-import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.squareup.picasso.Picasso
 
 object Utilities {
 
     fun loadImg(url: String, img: ImageView) {
+
+
         try {
-            Picasso.get().load(url).fit().error(R.drawable.img).into(img)
-        }catch (e:java.lang.Exception){
-            Picasso.get().load(url.toUri()).fit().error(R.drawable.img).into(img)
+            if (Patterns.WEB_URL.matcher(url).matches()) {
+                Picasso.get().load(url).fit().error(R.drawable.img).into(img)
+            }else{
+                Picasso.get().load(url.toUri()).fit().error(R.drawable.img).into(img)
+            }
+
+        } catch (e: java.lang.Exception) {
+
         }
     }
 

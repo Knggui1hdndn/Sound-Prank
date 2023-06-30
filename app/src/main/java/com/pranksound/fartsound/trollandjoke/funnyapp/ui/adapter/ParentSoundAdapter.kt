@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
+import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ItemSoundBinding
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
@@ -55,6 +56,7 @@ class ParentSoundAdapter(
                 }
 
                 mLiner.setOnClickListener {
+
                     isChecked = !isChecked
                     mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
                     if (isChecked) {
@@ -80,6 +82,7 @@ class ParentSoundAdapter(
                 click.itemClick(Triple(mDataImage, isChecked, listDataSound), position)
             } else {
                 setChildAdapter(mDataImage.id) {
+
                     binding.mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
                     click.itemClick(Triple(mDataImage, isChecked, it), position)
                 }
@@ -121,7 +124,6 @@ class ParentSoundAdapter(
             val context = binding.root.context
             val intent = Intent(context, Show::class.java)
             intent.putExtra(Constraints.SOUND_CHILD_CLICK, position)
-            Log.d("clickkkkkkkkkkkkk", position.toString())
             intent.putExtra(Constraints.PARENT_SOUND, mDataImage)
             context.startActivity(intent)
         }
