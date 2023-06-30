@@ -1,6 +1,8 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.contract
 
 import android.content.res.AssetFileDescriptor
+import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
+import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 
 interface ShowContract {
     interface MusicPlayerView {
@@ -9,20 +11,22 @@ interface ShowContract {
         fun loadFailed(e: String)
         fun showCurrentItem(int: Int)
         fun showMenuPopup()
-
+        fun downLoadSuccess()
+        fun dowLoadFailed(e:String)
     }
 
     interface MusicPlayerPresenter {
-        fun setLooping(isLooping:Boolean)
+        fun downLoad(mImg: DataImage, mSound: DataSound)
+        fun setLooping(isLooping: Boolean)
         fun clickMenuPopup()
-        fun clickItemMenuPopup(position:Int)
+        fun clickItemMenuPopup(position: Int)
         fun nextItem()
         fun prevItem()
         fun getMaxVolume(): Int
         fun playMusicOnl(url: String)
         fun playMusicOff(raw: AssetFileDescriptor)
-        fun playMusic (url: String)
-        fun getCurrentVolume():Int
+        fun playMusic(url: String)
+        fun getCurrentVolume(): Int
 
         fun pauseMusic()
         fun adjustVolume(volume: Int)

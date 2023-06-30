@@ -1,6 +1,7 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.presenter
 
 import com.pranksound.fartsound.trollandjoke.funnyapp.ApiClient
+import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImages
@@ -15,8 +16,9 @@ import java.util.function.BinaryOperator
 
 
 class ApiClientPresenter() : ApiClientContract.Presenter {
-    override fun downloadSound(url: String, callback: (InputStream?) -> Unit) {
-        ApiClient.apiInterface.downloadSound(url)
+    override fun downloadStream(url: String, callback: (InputStream?) -> Unit) {
+        Constraints.BASE_URL=url
+        ApiClient.apiInterface.downloadStream(url)
             .enqueue(object : retrofit2.Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,
@@ -32,6 +34,7 @@ class ApiClientPresenter() : ApiClientContract.Presenter {
                 }
 
             })
+        Constraints.BASE_URL=Constraints.BASE_URL1
     }
 
 
@@ -52,7 +55,6 @@ class ApiClientPresenter() : ApiClientContract.Presenter {
                 override fun onFailure(call: Call<DataSounds>, t: Throwable) {
                     listens.onFailed(t.message.toString())
                 }
-
             })
     }
 

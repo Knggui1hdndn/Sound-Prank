@@ -11,6 +11,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Url
 import java.util.concurrent.TimeUnit
 
 interface ApiClient {
@@ -25,7 +26,8 @@ interface ApiClient {
             .addConverterFactory(GsonConverterFactory.create()).build()
             .create(ApiClient::class.java)
     }
-
+    @GET
+    fun downloadStream(@Url url: String): Call<ResponseBody>
 
     @GET("category/{id}")
     fun getListChildSound(@Path("id") id: String): Call<DataSounds>
@@ -33,6 +35,5 @@ interface ApiClient {
     @GET("category/")
     fun getListParentSound(): Call<DataImages>
 
-    @GET("")
-    fun downloadSound(url: String): Call<ResponseBody>
+
 }

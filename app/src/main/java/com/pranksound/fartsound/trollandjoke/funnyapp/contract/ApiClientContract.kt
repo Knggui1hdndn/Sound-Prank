@@ -14,7 +14,7 @@ interface ApiClientContract {
     }
 
     interface Presenter{
-        fun downloadSound (url:String,callback: (InputStream? )->Unit)
+        fun downloadStream (url:String,callback: (InputStream? )->Unit)
          fun getListChildSound(id :String,listens: Listens)
         fun getListParentSound(listens: Listens)
     }

@@ -9,25 +9,28 @@ import android.os.Build
 import android.widget.Toast
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 
+interface ListenNetwork {
+    fun onChangeNetwork(string: String)
+}
 
-class ListensChangeNetwork : BroadcastReceiver() {
+class ListensChangeNetwork(val listensChangeNetwork: ListenNetwork) : BroadcastReceiver()  {
+    companion object {
+        var isConnectNetwork = ""
+    }
+
     override fun onReceive(context: Context?, intent: Intent?) {
         val connectivityManager =
             context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val capabilities = connectivityManager.getNetworkCapabilities(network)
         if (capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {//check xem có khả năng kết nối internet hay không
-            intent!!.action = Constraints.CONNECTION_NETWORK
-            context.sendBroadcast(intent)
-
-            // Mạng đã được bật
-            Toast.makeText(context, "Mạng đã được bật", Toast.LENGTH_SHORT).show()
+            isConnectNetwork = Constraints.CONNECTION_NETWORK
+            listensChangeNetwork.onChangeNetwork(isConnectNetwork)
         } else {
-            intent!!.action = Constraints.DISCONNECT_NETWORK
-            context.sendBroadcast(intent)
-
-            // Mạng đã bị tắt
-            Toast.makeText(context, "Mạng đã bị tắt", Toast.LENGTH_SHORT).show()
+            isConnectNetwork = Constraints.DISCONNECT_NETWORK
+            listensChangeNetwork.onChangeNetwork(isConnectNetwork)
         }
     }
+
+
 }

@@ -3,7 +3,6 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,23 +13,19 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
-import java.lang.Exception
 
 
-interface OffOrHotAdapterListens {
+interface  ChildSoundAdapterListen {
     fun itemClick(bitmap: Bitmap, linkSound: String, checkFirst: Boolean)
 }
 
-class OffOrHotAdapter(
+class ShowChildSoundAdapter(
     private val list: List<DataSound>,
-    private val position: Int,
-    val offOrHotAdapterListens: OffOrHotAdapterListens
+     val offOrHotAdapterListens: ChildSoundAdapterListen
 ) :
-    RecyclerView.Adapter<OffOrHotAdapter.OffOrHotAdapterViewHolder>() {
+    RecyclerView.Adapter<ShowChildSoundAdapter.HotAdapterListensViewHolder>() {
 
-    inner class OffOrHotAdapterViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    inner class HotAdapterListensViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         private var img: ImageView = view.findViewById(R.id.img)
         private var mView: CardView = view.findViewById(R.id.mView)
 
@@ -52,10 +47,10 @@ class OffOrHotAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): OffOrHotAdapterViewHolder {
-        return OffOrHotAdapterViewHolder(
+    ): HotAdapterListensViewHolder {
+        return HotAdapterListensViewHolder(
             LayoutInflater.from(parent.context).inflate(
-                if (viewType == Constraints.VIEW_TYPE_HOT) R.layout.item_hot_sound else R.layout.item_off,
+                R.layout.item_hot_sound_1  ,
                 parent, false
             )
         )
@@ -66,11 +61,9 @@ class OffOrHotAdapter(
         return list.size
     }
 
-    override fun onBindViewHolder(holder: OffOrHotAdapterViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: HotAdapterListensViewHolder, position: Int) {
         holder.bind(list[position])
-    }
+     }
 
-    override fun getItemViewType(position: Int): Int {
-        return if (this.position == 0) Constraints.VIEW_TYPE_OFF else Constraints.VIEW_TYPE_HOT
-    }
+
 }
