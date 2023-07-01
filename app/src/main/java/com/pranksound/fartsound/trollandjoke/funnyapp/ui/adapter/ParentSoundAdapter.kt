@@ -35,7 +35,7 @@ class ParentSoundAdapter(
 
     inner class ParentSoundViewHolder(val binding: ItemSoundBinding) :
         RecyclerView.ViewHolder(binding.root), ChildSoundClickListens {
-        private var childAdapter: ChildSoundAdapter? = null
+        private var childAdapter: ChildSoundAdapter?  = null
         private lateinit var mDataImage: DataImage
         private lateinit var context: Context
         private var isChecked by Delegates.notNull<Boolean>()

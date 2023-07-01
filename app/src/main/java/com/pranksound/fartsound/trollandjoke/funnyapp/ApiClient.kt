@@ -21,8 +21,9 @@ interface ApiClient {
             .readTimeout(4000L, TimeUnit.MILLISECONDS)// đặt thời gian tối đa để đọc dữ liệu
             .build()
         var url = BASE_URL
-        var apiInterface: ApiClient = Retrofit.Builder().baseUrl(url)
+        var apiInterface: ApiClient = Retrofit.Builder()
             .client(okHttpClient)
+            .baseUrl(url+"/")
             .addConverterFactory(GsonConverterFactory.create()).build()
             .create(ApiClient::class.java)
     }

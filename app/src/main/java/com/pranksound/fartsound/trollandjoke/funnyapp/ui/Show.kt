@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.SeekBar
@@ -47,6 +48,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
     private lateinit var showPresenter: ShowPresenter
     private lateinit var apiClientPresenter: ApiClientPresenter
     private lateinit var mDataImage: DataImage
+    private var checkFavorite: Boolean = false
     private var currentPosition = 0
     private var check = ""
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +65,9 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
             btnTime.setOnClickListener { showPresenter.clickMenuPopup() }
             btnPre.setOnClickListener { showPresenter.prevItem() }
             img.setOnClickListener { showPresenter.playMusic(list[currentPosition].source) }
+
             imgDowload.setOnClickListener {
+
                 showPresenter.downLoad(mDataImage, list[currentPosition])
                 imgDowload.isEnabled = false
                 binding.mProgress1.visibility = View.VISIBLE
@@ -71,7 +75,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
             cbFavourite.setOnClickListener {
                 with(FileHandler) {
                     if (check == Constraints.CONNECTION_NETWORK) {
-                        saveFavoriteOnl(list[currentPosition], this@Show)
+                        saveFavoriteOnl(list[currentPosition], mDataImage, this@Show)
                     } else {
                         saveFavoriteOff(list[currentPosition], this@Show)
                     }
@@ -83,59 +87,52 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
                 override fun onPageScrolled(
                     position: Int, positionOffset: Float, positionOffsetPixels: Int
                 ) {
+
                     currentPosition = position
                     showPresenter.currentPosition = currentPosition
+
                     showPresenter.checkFavorite(check, list[currentPosition].source)
-                    showPresenter.checkDownLoad(mDataImage.name)
+                    showPresenter.checkDownLoad(mDataImage.name,list[currentPosition].source)
                     setImage()
+
                 }
             })
-        }
+         }
     }
 
     private fun setUpActivity() {
         binding.mConstraint.isEnabled = false
-        mDataImage = getDataImage()
         apiClientPresenter = ApiClientPresenter()
         list = mutableListOf()
-        showPresenter = ShowPresenter(this, this, 0, apiClientPresenter)
+        val checkNetWork = ListensChangeNetwork.isConnectNetwork == Constraints.DISCONNECT_NETWORK
         binding.mConstraint.isEnabled = false
         val intent = intent
-
-        if (intent.getStringExtra(Constraints.ACTIVITY_LAUNCH) =="Favorite") {
+        if (intent.getStringExtra(Constraints.ACTIVITY_LAUNCH) == "Favorite") {
+            checkFavorite = true
+            mDataImage = FileHandler.getFavoriteOnl(this@Show)[currentPosition].first!!
             currentPosition = intent.getIntExtra(Constraints.SOUND_CHILD_CLICK, 0)
-
-            val checkNetWork =
-                ListensChangeNetwork.isConnectNetwork == Constraints.DISCONNECT_NETWORK
-
-
-            if (checkNetWork) {
-                list.addAll(FileHandler.getFavoriteOff(this))
-                onFailed("e")
-            } else {
-                list.addAll(FileHandler.getFavoriteOnl(this))
-                list.addAll(FileHandler.getFavoriteOff(this))
-                onFailed("e")
-            }
+            list.addAll(FileHandler.getFavoriteOff(this).map { it.second })
+            list.addAll(FileHandler.getFavoriteOnl(this).map { it.second })
+            onFailed("e")
         } else {
             mDataImage = getDataImage()
-            val checkNetWork =
-                ListensChangeNetwork.isConnectNetwork == Constraints.DISCONNECT_NETWORK
             if (checkNetWork) {
-                try {
-                    list = FileHandler.getFileAssetByParentSound(this, mDataImage.name).toMutableList()
+                list = try {
+                    FileHandler.getFileAssetByParentSound(this, mDataImage.name).toMutableList()
                 } catch (e: Exception) {
-                    list =
-                        FileHandler.getDataSoundChildFromInternalStorage(this, mDataImage.name)[0].third.toMutableList()
+                    FileHandler.getDataSoundChildFromInternalStorage(
+                        this,
+                        mDataImage.name
+                    )[0].third.toMutableList()
                 }
                 onFailed("e")
             } else {
                 apiClientPresenter.getListChildSound(mDataImage.id, this)
             }
             check = ListensChangeNetwork.isConnectNetwork
+            if (check == Constraints.DISCONNECT_NETWORK) binding.imgDowload.visibility = View.GONE
         }
-
-
+        showPresenter = ShowPresenter(this, this, list.size, apiClientPresenter)
     }
 
     override fun showMenuPopup() {
@@ -157,7 +154,10 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
         binding.imgDowload.setImageDrawable(getDrawable(R.drawable.baseline_cloud_done_24))
         binding.imgDowload.isEnabled = false
         binding.mProgress1.visibility = View.INVISIBLE
-
+        if (checkFavorite) {
+            FileHandler.removeFavoriteOnl(this, list[currentPosition])
+            FileHandler.saveFavoriteOff(list[currentPosition], this)
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -165,7 +165,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
         binding.imgDowload.setImageDrawable(getDrawable(R.drawable.baseline_cloud_download_24))
         binding.imgDowload.isEnabled = true
         binding.mProgress1.visibility = View.INVISIBLE
-        Utilities.showSnackBar(binding.root, "Lỗi mạng")
+        Utilities.showSnackBar(binding.root, e)
     }
 
     override fun isFavorite(boolean: Boolean) {
@@ -201,7 +201,6 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
         setAdapter()
         binding.mProgress1.visibility = View.INVISIBLE
         binding.mConstraint.isEnabled = true
-
     }
 
     private fun setAdapter() {

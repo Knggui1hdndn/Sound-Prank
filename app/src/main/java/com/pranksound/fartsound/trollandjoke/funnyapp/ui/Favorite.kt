@@ -41,11 +41,11 @@ class Favorite : AppCompatActivity(), ListenNetwork, ChildSoundClickListens {
     private fun setAdapter() {
         adapterFavorite =
             if (ListensChangeNetwork.isConnectNetwork == Constraints.CONNECTION_NETWORK) {
-                listSound.addAll(FileHandler.getFavoriteOnl(this))
-                listSound.addAll(FileHandler.getFavoriteOff(this))
+                listSound.addAll(FileHandler.getFavoriteOnl(this).map { it.second })
+                listSound.addAll(FileHandler.getFavoriteOff(this).map { it.second })
                 ChildSoundAdapter(listSound, this)
             } else {
-                listSound.addAll(FileHandler.getFavoriteOff(this))
+                listSound.addAll(FileHandler.getFavoriteOff(this).map { it.second })
                 ChildSoundAdapter(listSound, this)
             }
         favorite.mRcy.apply {

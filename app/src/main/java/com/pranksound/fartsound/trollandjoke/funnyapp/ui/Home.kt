@@ -40,7 +40,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
     }
 
     override fun onFailed(e: String) {
-        ListensChangeNetwork.isConnectNetwork=Constraints.DISCONNECT_NETWORK
+        ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
         binding.mProgress.visibility = View.GONE
         Utilities.showSnackBar(binding.root, "Vui lòng kiểm tra kết nối")
         listHash.clear()
@@ -62,22 +62,14 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.mToolBar)
-         listHash = mutableListOf()
+        listHash = mutableListOf()
         presenter = ApiClientPresenter()
         listensChangeNetwork = ListensChangeNetwork(this)
         intentFilter = IntentFilter(Constraints.CONNECTIVITY_CHANGE)
         registerReceiver(listensChangeNetwork, intentFilter)
-
+        Log.d("plplplplp",FileHandler.getFavoriteOnl(this ).toString())
     }
 
-    override fun onResume() {
-        super.onResume()
-
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
 
     private fun setAdapter() {
         adapter = ParentSoundAdapter(listHash, presenter, this)
@@ -85,12 +77,14 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         binding.mRcy.layoutManager = lmg
         binding.mRcy.adapter = adapter
     }
+
     private fun setAdapterMeme(lists: List<DataImage>) {
         adapterMeme = HotSoundAdapter(lists)
         val lmg = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.mRcyMeme.layoutManager = lmg
         binding.mRcyMeme.adapter = adapterMeme
     }
+
     private fun setAdapterHot(list: List<DataImage>) {
         val lists = list.shuffled()
         adapterHot = HotSoundAdapter(lists)
@@ -127,17 +121,16 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
                 binding.mProgress.visibility = View.VISIBLE
                 presenter.getListParentSound(this)
                 Utilities.showSnackBar(binding.root, "Đang load")
-                binding.mRcyHot.visibility=View.VISIBLE
-                binding.mRcyMeme.visibility=View.VISIBLE
+                binding.mRcyHot.visibility = View.VISIBLE
+                binding.mRcyMeme.visibility = View.VISIBLE
             }
 
             Constraints.DISCONNECT_NETWORK -> {
                 binding.mProgress.visibility = View.VISIBLE
-                binding.mRcyHot.visibility=View.GONE
-                binding.mRcyMeme.visibility=View.GONE
+                binding.mRcyHot.visibility = View.GONE
+                binding.mRcyMeme.visibility = View.GONE
                 onFailed("lỗi")
                 Utilities.showSnackBar(binding.root, "Vui lòng kiểm tra kết nối")
-
             }
         }
     }

@@ -2,18 +2,20 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.presenter
 
 import android.content.Context
 import android.content.res.AssetFileDescriptor
+import android.content.res.AssetManager
 import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
-import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
+import androidx.core.net.toUri
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ShowContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
+import java.io.IOException
+
 
 class ShowPresenter(
     val view: ShowContract.MusicPlayerView,
@@ -27,63 +29,67 @@ class ShowPresenter(
     var currentPosition = 0
     private var isLooping = false
     override fun checkFavorite(stateNetWork: String, sound: String) {
-        var isFavorite = false
-        isFavorite = if (stateNetWork == Constraints.CONNECTION_NETWORK) {
-            FileHandler.getFavoriteOnl(context).any { it.source == sound }
-        } else {
-            FileHandler.getFavoriteOff(context).any { it.source == sound }
-        }
-        view.isFavorite(isFavorite)
+        var isFavoriteOnl = FileHandler.getFavoriteOnl(context).any { it.second.source == sound }
+        var isFavoriteOff = FileHandler.getFavoriteOff(context).any { it.second.source == sound }
+
+        view.isFavorite(isFavoriteOff || isFavoriteOnl )
     }
 
-    override fun checkDownLoad(nameParentSound: String) {
-        FileHandler.checkFileExists(context, nameParentSound, currentPosition).let {
+
+
+    override fun checkDownLoad(nameParentSound: String,pathSound: String) {
+        FileHandler.checkFileExists(context, nameParentSound,pathSound ,currentPosition).let {
             if (!it) {
                 view.isDownload(true, R.drawable.baseline_cloud_download_24)
-
             } else {
-                view.isDownload(false, R.drawable.baseline_cloud_done_24)
+                 view.isDownload(false, R.drawable.baseline_cloud_done_24)
             }
         }
 
     }
 
     override fun downLoad(mImg: DataImage, mSound: DataSound) {
-        apiClientPresenter.downloadStream(mSound.source) { sound ->
-            if (sound != null) {
-                apiClientPresenter.downloadStream(mImg.icon) { imgParent ->
-                    if (imgParent != null) {
-                        apiClientPresenter.downloadStream(mSound.image) { imgChild ->
-                            if (imgChild != null) {
-                                Toast.makeText(context, "OK", Toast.LENGTH_SHORT).show()
-                                val bitmapImgSound = BitmapFactory.decodeStream(imgParent)
-                                val bitmapImgImage = BitmapFactory.decodeStream(imgChild)
-                                FileHandler.saveImgParentToAppDirectory(
-                                    context, bitmapImgSound, mImg.name
-                                )
-                                FileHandler.saveImgToAppDirectory(
-                                    context, bitmapImgImage, mImg.name, mImg.name + currentPosition
-                                )
-                                FileHandler.saveFileToAppDirectory(
-                                    sound, mImg.name, mImg.name + currentPosition, context
-                                )
-                                view.downLoadSuccess()
-                            } else {
-                                view.dowLoadFailed("Kiểm tra mạng")
+        try {
+            apiClientPresenter.downloadStream(mSound.source) { sound ->
+                if (sound != null) {
+                    apiClientPresenter.downloadStream(mImg.icon) { imgParent ->
+                        if (imgParent != null) {
+                            apiClientPresenter.downloadStream(mSound.image) { imgChild ->
+                                if (imgChild != null) {
+                                    val bitmapImgSound = BitmapFactory.decodeStream(imgParent)
+                                    val bitmapImgImage = BitmapFactory.decodeStream(imgChild)
+                                    FileHandler.saveImgParentToAppDirectory(
+                                        context, bitmapImgSound, mImg.name
+                                    )
+                                    FileHandler.saveImgToAppDirectory(
+                                        context,
+                                        bitmapImgImage,
+                                        mImg.name,
+                                        mImg.name + currentPosition
+                                    )
+                                    FileHandler.saveFileToAppDirectory(
+                                        sound, mImg.name, mImg.name + currentPosition, context
+                                    )
+                                    view.downLoadSuccess()
+                                } else {
+                                    view.dowLoadFailed("Kiểm tra mạng")
+                                }
                             }
+                        } else {
+                            view.dowLoadFailed("Kiểm tra mạng")
                         }
-                    } else {
-                        view.dowLoadFailed("Kiểm tra mạng")
                     }
+                } else {
+                    view.dowLoadFailed("Kiểm tra mạng")
                 }
-            }else{
-                view.dowLoadFailed("Kiểm tra mạng")
             }
+        } catch (e: Exception) {
+            view.dowLoadFailed("Kiểm tra mạng" + e.toString())
         }
     }
 
     override fun setLooping(isLooping: Boolean) {
-         this.isLooping=isLooping
+        this.isLooping = isLooping
 
     }
 
@@ -129,14 +135,14 @@ class ShowPresenter(
         if (mediaPlayer.isPlaying) mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
         view.load()
-        mediaPlayer.setDataSource(url)
+        mediaPlayer.setDataSource(context, url.toUri())
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
             mediaPlayer.start()
             view.loadSuccess()
         }
         mediaPlayer.setOnErrorListener { mp, what, extra ->
-          setError(what)
+            setError(what)
             false
         }
     }
@@ -163,10 +169,11 @@ class ShowPresenter(
                 // Xử lý lỗi quá thời gian chờ
                 view.loadFailed("Timeout error occurred")
             }
-else->{
-    view.loadFailed("Không có kết nối mạng")
 
-}
+            else -> {
+                view.loadFailed("Không có kết nối mạng")
+
+            }
         }
     }
 
@@ -176,21 +183,21 @@ else->{
         mediaPlayer = MediaPlayer()
         mediaPlayer.setDataSource(raw)
         mediaPlayer.prepare();
-         mediaPlayer.start()
+        mediaPlayer.start()
     }
 
     override fun playMusic(url: String) {
-       try {
-           val check= context.assets.openFd(url)
-           playMusicOff(check)
-       }catch (e:Exception){
-           playMusicOnl(url)
-       }
+        try {
+            val check = context.assets.openFd(url)
+            playMusicOff(check)
+        } catch (e: Exception) {
+            playMusicOnl(url)
+        }
 
     }
 
     override fun getCurrentVolume(): Int {
-         return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
     }
 
     override fun pauseMusic() {
@@ -207,7 +214,7 @@ else->{
     }
 
     override fun setRepeatInterval(intervalSeconds: Int) {
-        if (!mediaPlayer.isPlaying){
+        if (!mediaPlayer.isPlaying) {
             Handler(Looper.getMainLooper()).postDelayed({
                 mediaPlayer.seekTo(0)
                 mediaPlayer.start()
@@ -216,8 +223,8 @@ else->{
         mediaPlayer.setOnCompletionListener { mp ->
             if (isLooping) {
                 Handler(Looper.getMainLooper()).postDelayed({
-                        mediaPlayer.seekTo(0)
-                        mediaPlayer.start()
+                    mediaPlayer.seekTo(0)
+                    mediaPlayer.start()
                 }, intervalSeconds.toLong())
             }
         }

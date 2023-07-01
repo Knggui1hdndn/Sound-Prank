@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
@@ -28,11 +29,13 @@ class ShowChildSoundAdapter(
     inner class HotAdapterListensViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         private var img: ImageView = view.findViewById(R.id.img)
         private var mView: CardView = view.findViewById(R.id.mView)
+        private var txt: TextView = view.findViewById(R.id.txt)
 
 
         @SuppressLint("UseCompatLoadingForDrawables")
         fun bind(mDataImage: DataSound) {
             Utilities.setImage(mDataImage.image, img,view.context)
+            txt.text=mDataImage.image
             mView.setOnClickListener {
                 offOrHotAdapterListens.itemClick(
                     (img.drawable as BitmapDrawable).bitmap,

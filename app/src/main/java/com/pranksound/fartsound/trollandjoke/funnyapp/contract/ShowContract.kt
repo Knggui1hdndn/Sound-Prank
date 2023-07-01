@@ -19,7 +19,7 @@ interface ShowContract {
 
     interface MusicPlayerPresenter {
         fun checkFavorite(stateNetWork:String,sound:String)
-        fun checkDownLoad(nameParentSound:String)
+        fun checkDownLoad(nameParentSound:String,pathSound: String)
         fun downLoad(mImg: DataImage, mSound: DataSound)
         fun setLooping(isLooping: Boolean)
         fun clickMenuPopup()
