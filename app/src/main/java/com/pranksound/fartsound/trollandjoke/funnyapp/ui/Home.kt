@@ -37,15 +37,20 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         setAdapter()
         setAdapterHot(list as List<DataImage>)
         setAdapterMeme(Constraints.LIST_MEME)
+        binding.mRcyHot.visibility = View.VISIBLE
+        binding.mRcyMeme.visibility = View.VISIBLE
     }
 
     override fun onFailed(e: String) {
-        ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
         binding.mProgress.visibility = View.GONE
         Utilities.showSnackBar(binding.root, "Vui lòng kiểm tra kết nối")
-        listHash.clear()
-        listHash.addAll(FileHandler.getAllFileAsset(this).toMutableList())
-        listHash.addAll(FileHandler.getDataSoundChildFromInternalStorage(this, null))
+        if (listHash.size ==0){
+            ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
+            listHash.addAll(FileHandler.getAllFileAsset(this).toMutableList())
+            listHash.addAll(FileHandler.getDataSoundChildFromInternalStorage(this, null))
+        }else{
+            ListensChangeNetwork.isConnectNetwork = Constraints.CONNECTION_NETWORK
+        }
         setAdapter()
     }
 
@@ -64,10 +69,10 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         setSupportActionBar(binding.mToolBar)
         listHash = mutableListOf()
         presenter = ApiClientPresenter()
+        presenter.getListParentSound(this)
         listensChangeNetwork = ListensChangeNetwork(this)
         intentFilter = IntentFilter(Constraints.CONNECTIVITY_CHANGE)
         registerReceiver(listensChangeNetwork, intentFilter)
-        Log.d("plplplplp",FileHandler.getFavoriteOnl(this ).toString())
     }
 
 
@@ -99,8 +104,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         try {
             adapter.setData(listHash)
         } catch (e: Exception) {
-            Log.d("dddddddđff", e.toString())
-        }
+         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -118,17 +122,11 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
     override fun onChangeNetwork(string: String) {
         when (string) {
             Constraints.CONNECTION_NETWORK -> {
-                binding.mProgress.visibility = View.VISIBLE
                 presenter.getListParentSound(this)
                 Utilities.showSnackBar(binding.root, "Đang load")
-                binding.mRcyHot.visibility = View.VISIBLE
-                binding.mRcyMeme.visibility = View.VISIBLE
             }
 
             Constraints.DISCONNECT_NETWORK -> {
-                binding.mProgress.visibility = View.VISIBLE
-                binding.mRcyHot.visibility = View.GONE
-                binding.mRcyMeme.visibility = View.GONE
                 onFailed("lỗi")
                 Utilities.showSnackBar(binding.root, "Vui lòng kiểm tra kết nối")
             }

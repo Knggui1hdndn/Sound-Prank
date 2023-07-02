@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit
 interface ApiClient {
     companion object {
         val okHttpClient = OkHttpClient.Builder()
-            .callTimeout(4000L, TimeUnit.MILLISECONDS)//đặt thời gian tối đa kết nối với sv
-            .readTimeout(4000L, TimeUnit.MILLISECONDS)// đặt thời gian tối đa để đọc dữ liệu
+            .callTimeout(1500L, TimeUnit.MILLISECONDS)//đặt thời gian tối đa kết nối với sv
+            .readTimeout(1500L, TimeUnit.MILLISECONDS)// đặt thời gian tối đa để đọc dữ liệu
             .build()
         var url = BASE_URL
         var apiInterface: ApiClient = Retrofit.Builder()

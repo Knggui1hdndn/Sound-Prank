@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints.AUTHORITY
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
@@ -146,14 +148,14 @@ object FileHandler {
         saveFavoriteSingle(context, mDataSound, mDataImage, Constraints.FAVORITE_ONL)
     }
 
-    fun saveFavoriteOff(mDataSound: DataSound, context: Context) {
-        saveFavoriteSingle(context, mDataSound, null, Constraints.FAVORITE_Off)
+    fun saveFavoriteOff(mDataSound: DataSound,  mDataImage: DataImage,context: Context) {
+        saveFavoriteSingle(context, mDataSound, mDataImage, Constraints.FAVORITE_Off)
     }
 
     private fun saveFavoriteSingle(
         context: Context,
         mDataSound: DataSound,
-        mDataImage: DataImage?,
+        mDataImage: DataImage ,
         typeFavorite: String
     ) {
         val getFavorite = getFavorite(context, typeFavorite)
@@ -173,7 +175,7 @@ object FileHandler {
 
     private fun saveFavoriteList(
         context: Context,
-        favoriteList: List<Pair<DataImage?, DataSound>>,
+        favoriteList: List<Pair<DataImage , DataSound>>,
         key: String
     ) {
         val shared = context.getSharedPreferences(key, Context.MODE_PRIVATE)
@@ -182,51 +184,46 @@ object FileHandler {
 
 
     @SuppressLint("WrongConstant")
-    fun getFavoriteOnl(context: Context): MutableList<Pair<DataImage?, DataSound>> {
+    fun getFavoriteOnl(context: Context): MutableList<Pair<DataImage , DataSound>> {
         return getFavorite(context, Constraints.FAVORITE_ONL)
     }
 
     @SuppressLint("WrongConstant")
-    fun getFavoriteOff(context: Context): MutableList<Pair<DataImage?, DataSound>> {
+    fun getFavoriteOff(context: Context): MutableList<Pair<DataImage , DataSound>> {
         return getFavorite(context, Constraints.FAVORITE_Off)
     }
 
-    private fun buildFavoriteDataString(list: MutableList<Pair<DataImage?, DataSound>>): String {
+    private fun buildFavoriteDataString(list: MutableList<Pair<DataImage , DataSound>>): String {
         val append = StringBuilder()
         list.forEach {
             val mDataImage = it.first
             val mDataSound = it.second
             //DataImage-DataSound
-            if (mDataImage != null) {
-                val sDataSound = mDataSound.let { "${it.source}&&${it.isPremium}&&${it.image}\n" }
-                val sDataImage = mDataImage.let { "${it.id}&&${it.name}&&${it.icon}&&" }
-                append.append(sDataImage + sDataSound)
-             } else {
-                val sDataSound = mDataSound.let { "${it.source}&&${it.isPremium}&&${it.image}\n" }
-                append.append(sDataSound)
-             }
+
+            val sDataSound = mDataSound.let { "${it.source}&&${it.isPremium}&&${it.image}\n" }
+            val sDataImage = mDataImage.let { "${it.id}&&${it.name}&&${it.icon}&&" }
+            append.append(sDataImage + sDataSound)
+
+
         }
-         return append.toString()
+        return append.toString()
     }
 
     private fun getFavorite(
         context: Context,
         typeFavorite: String
-    ): MutableList<Pair<DataImage?, DataSound>> {
+    ): MutableList<Pair<DataImage , DataSound>> {
         val shared = context.getSharedPreferences(typeFavorite, Context.MODE_PRIVATE)
         val list = shared.getString(typeFavorite, "")
         val listSplit = list!!.split("\n")
         return parseSoundDataList(listSplit)
     }
 
-    private fun parseSoundDataList(listSplit: List<String>): MutableList<Pair<DataImage?, DataSound>> {
-        val mutableList = mutableListOf<Pair<DataImage?, DataSound>>()
+    private fun parseSoundDataList(listSplit: List<String>): MutableList<Pair<DataImage , DataSound>> {
+        val mutableList = mutableListOf<Pair<DataImage , DataSound>>()
         for (sound in listSplit) {
             val soundDataSplit = sound.split("&&")
-            if (soundDataSplit.size == 3) {
-                val dataSound = DataSound(soundDataSplit[0], soundDataSplit[1], soundDataSplit[2])
-                mutableList.add(Pair(null, dataSound))
-            }
+
             if (soundDataSplit.size > 3) {
                 val dataSound = DataSound(soundDataSplit[3], soundDataSplit[4], soundDataSplit[5])
                 val dataImage = DataImage(soundDataSplit[0], soundDataSplit[1], soundDataSplit[2])
@@ -237,9 +234,18 @@ object FileHandler {
     }
 
 
-    fun checkFileExists(context: Context, nameParent: String,pathSound:String, position: Int): Boolean {
-        return File("${context.filesDir}/$nameParent/${nameParent + position}/${nameParent + position}.png").exists() || isFileExistsInAssets(pathSound,context)
+    fun checkFileExists(
+        context: Context,
+        nameParent: String,
+        pathSound: String,
+        position: Int,
+    ): Boolean {
+        return File("${context.filesDir}/$nameParent/${nameParent + position}/${nameParent + position}.png").exists() || isFileExistsInAssets(
+            pathSound,
+            context
+        ) ||File( "${context.filesDir}/$nameParent/${nameParent + position}/${nameParent + position}.mp3".toUri().path).exists()
     }
+
     private fun isFileExistsInAssets(filePath: String?, context: Context): Boolean {
         val assetManager: AssetManager = context.assets
         return try {
@@ -250,6 +256,7 @@ object FileHandler {
             false // Tệp tin không tồn tại trong assets
         }
     }
+
     private fun getFolderName(context: Context, nameParent: String?): MutableList<String> {
         val list = mutableListOf<String>()
         val directory = context.filesDir

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 
@@ -24,13 +25,9 @@ class ListensChangeNetwork(val listensChangeNetwork: ListenNetwork) : BroadcastR
         val network = connectivityManager.activeNetwork
         val capabilities = connectivityManager.getNetworkCapabilities(network)
         if (capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {//check xem có khả năng kết nối internet hay không
-            isConnectNetwork = Constraints.CONNECTION_NETWORK
-            listensChangeNetwork.onChangeNetwork(isConnectNetwork)
+             listensChangeNetwork.onChangeNetwork(isConnectNetwork)
         } else {
-            isConnectNetwork = Constraints.DISCONNECT_NETWORK
-            listensChangeNetwork.onChangeNetwork(isConnectNetwork)
+             listensChangeNetwork.onChangeNetwork(isConnectNetwork)
         }
     }
-
-
 }

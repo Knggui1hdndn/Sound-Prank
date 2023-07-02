@@ -6,43 +6,68 @@ import android.content.res.AssetManager
 import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.core.net.toUri
+import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ShowContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
+import java.io.File
 import java.io.IOException
 
 
 class ShowPresenter(
-    val view: ShowContract.MusicPlayerView,
+    private val view: ShowContract.MusicPlayerView,
     val context: Context,
-    val listSize: Int,
-    val apiClientPresenter: ApiClientPresenter
+    private val listSize: Int,
+    private val apiClientPresenter: ApiClientPresenter
 ) :
     ShowContract.MusicPlayerPresenter {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private var mediaPlayer = MediaPlayer()
     var currentPosition = 0
     private var isLooping = false
-    override fun checkFavorite(stateNetWork: String, sound: String) {
-        var isFavoriteOnl = FileHandler.getFavoriteOnl(context).any { it.second.source == sound }
-        var isFavoriteOff = FileHandler.getFavoriteOff(context).any { it.second.source == sound }
+    override fun handleFavoriteChecked(
+        isChecked: Boolean,
+        dataSound: DataSound,
+        mDataImage: DataImage,
+        isDisconnect: Boolean
+    ) {
+        with(FileHandler) {
+            if (isDisconnect) {
+                if (isChecked)
+                    saveFavoriteOff(dataSound, mDataImage, context)
+                else
+                    removeFavoriteOff(context, dataSound)
+            } else {
+                if (isChecked)
+                    saveFavoriteOnl(dataSound, mDataImage, context)
+                else
+                    removeFavoriteOnl(context, dataSound)
+            }
+        }
+    }
 
-        view.isFavorite(isFavoriteOff || isFavoriteOnl )
+    override fun isFavorite(sound: String): Boolean {
+        val isFavoriteOnl = FileHandler.getFavoriteOnl(context).any { it.second.source == sound }
+        val isFavoriteOff = FileHandler.getFavoriteOff(context).any { it.second.source == sound }
+
+        view.isFavorite(isFavoriteOff || isFavoriteOnl)
+        return isFavoriteOff || isFavoriteOnl
     }
 
 
-
-    override fun checkDownLoad(nameParentSound: String,pathSound: String) {
-        FileHandler.checkFileExists(context, nameParentSound,pathSound ,currentPosition).let {
+    override fun checkDownLoad(nameParentSound: String, pathSound: String) {
+        FileHandler.checkFileExists(context, nameParentSound, pathSound, currentPosition).let {
             if (!it) {
                 view.isDownload(true, R.drawable.baseline_cloud_download_24)
             } else {
-                 view.isDownload(false, R.drawable.baseline_cloud_done_24)
+                view.isDownload(false, R.drawable.baseline_cloud_done_24)
             }
         }
 
@@ -84,7 +109,7 @@ class ShowPresenter(
                 }
             }
         } catch (e: Exception) {
-            view.dowLoadFailed("Kiểm tra mạng" + e.toString())
+            view.dowLoadFailed("Kiểm tra mạng$e")
         }
     }
 
@@ -141,7 +166,7 @@ class ShowPresenter(
             mediaPlayer.start()
             view.loadSuccess()
         }
-        mediaPlayer.setOnErrorListener { mp, what, extra ->
+        mediaPlayer.setOnErrorListener { mp, what, _ ->
             setError(what)
             false
         }
@@ -178,11 +203,10 @@ class ShowPresenter(
     }
 
     override fun playMusicOff(raw: AssetFileDescriptor) {
-
         if (mediaPlayer.isPlaying) mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
         mediaPlayer.setDataSource(raw)
-        mediaPlayer.prepare();
+        mediaPlayer.prepare()
         mediaPlayer.start()
     }
 
@@ -220,7 +244,7 @@ class ShowPresenter(
                 mediaPlayer.start()
             }, intervalSeconds.toLong())
         }
-        mediaPlayer.setOnCompletionListener { mp ->
+        mediaPlayer.setOnCompletionListener {
             if (isLooping) {
                 Handler(Looper.getMainLooper()).postDelayed({
                     mediaPlayer.seekTo(0)
