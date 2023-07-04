@@ -1,16 +1,16 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 
+import android.app.Activity
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
-import android.util.Patterns
 import android.view.View
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
-import com.pranksound.fartsound.trollandjoke.funnyapp.broadcast.ListenNetwork
 import com.pranksound.fartsound.trollandjoke.funnyapp.broadcast.ListensChangeNetwork
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ActivityFavoriteBinding
@@ -18,7 +18,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundAdapter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundClickListens
-import java.util.regex.Pattern
+
 
 class Favorite : AppCompatActivity(), ChildSoundClickListens {
     private lateinit var favorite: ActivityFavoriteBinding
@@ -43,10 +43,9 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
             }
 
             override fun onFailed(e: String) {
-                checkNetwork=false
-                ListensChangeNetwork.isConnectNetwork=Constraints.DISCONNECT_NETWORK
-
-                favorite.mProgress.visibility=View.GONE
+                checkNetwork = false
+                ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
+                favorite.mProgress.visibility = View.GONE
                 listSound.addAll(FileHandler.getFavoriteOff(this@Favorite).map { it.second })
                 setAdapter()
             }
@@ -54,6 +53,16 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
         })
     }
 
+    private val startForResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data!!.getIntegerArrayListExtra(Constraints.POSITION_FAVORITE_UNCHECKED)?.forEach {
+                listSound.removeAt(it)
+            }
+            adapterFavorite.setData(listSound)
+        }
+    }
 
     private fun setAdapter() {
         adapterFavorite = ChildSoundAdapter(listSound, this)
@@ -69,6 +78,6 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
         intent.putExtra("sound", listSound[position].source)
         intent.putExtra("checkNetwork", checkNetwork)
         intent.putExtra(Constraints.SOUND_CHILD_CLICK, position)
-        startActivity(intent)
+        startForResult.launch(intent)
     }
 }

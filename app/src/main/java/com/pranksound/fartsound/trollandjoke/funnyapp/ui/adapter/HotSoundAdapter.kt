@@ -1,11 +1,8 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter
 
-import android.annotation.SuppressLint
-import android.content.Intent
+ import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.util.Log
-import android.view.LayoutInflater
+  import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -14,8 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
-import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
-import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
+ import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
 
 

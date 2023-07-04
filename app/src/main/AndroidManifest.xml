@@ -24,6 +24,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <receiver android:name=".broadcast.ListensChangeNetwork"
+            android:exported="true">
+
+        </receiver>
         <activity
             android:name=".ui.Show"
             android:exported="false" />

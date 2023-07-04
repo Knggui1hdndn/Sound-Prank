@@ -1,23 +1,25 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter
 
-import android.util.Log
-import android.view.LayoutInflater
+ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ItemChildSoundBinding
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
-import com.squareup.picasso.Picasso
 
 interface ChildSoundClickListens {
     fun itemClick(position: Int)
 }
 
 class ChildSoundAdapter(
-    private val list: List<DataSound>,
+    private var list: List<DataSound>,
     private val childSoundClickListens: ChildSoundClickListens
 ) :
     RecyclerView.Adapter<ChildSoundAdapter.ChildSoundViewHolder>() {
+    fun setData(list: List<DataSound>){
+        this.list=list
+        notifyDataSetChanged()
+    }
     inner class ChildSoundViewHolder(val binding: ItemChildSoundBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(dataSound: DataSound, position: Int) {

@@ -5,6 +5,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 object Constraints {
     const val SOUND_CHILD_CLICK = "SOUND_CHILD_CLICK"
     const val PARENT_SOUND = "PARENT_SOUND"
+    const val POSITION_FAVORITE_UNCHECKED = "POSITION_FAVORITE_UNCHECKED"
     const val CONNECTION_NETWORK = "CONNECTION_NETWORK"
     const val DISCONNECT_NETWORK = "DISCONNECT_NETWORK"
     var BASE_URL = "http://167.172.146.247:6789/api"

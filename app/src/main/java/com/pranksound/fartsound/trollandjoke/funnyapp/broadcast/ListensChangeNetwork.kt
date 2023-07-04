@@ -5,10 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
+
 
 interface ListenNetwork {
     fun onChangeNetwork(string: String)
@@ -20,14 +19,15 @@ class ListensChangeNetwork(val listensChangeNetwork: ListenNetwork) : BroadcastR
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
+        Log.d("okokokoko","okoooooo")
         val connectivityManager =
             context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val capabilities = connectivityManager.getNetworkCapabilities(network)
         if (capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {//check xem có khả năng kết nối internet hay không
-             listensChangeNetwork.onChangeNetwork(isConnectNetwork)
+             listensChangeNetwork.onChangeNetwork(Constraints.CONNECTION_NETWORK)
         } else {
-             listensChangeNetwork.onChangeNetwork(isConnectNetwork)
+             listensChangeNetwork.onChangeNetwork(Constraints.DISCONNECT_NETWORK)
         }
     }
 }

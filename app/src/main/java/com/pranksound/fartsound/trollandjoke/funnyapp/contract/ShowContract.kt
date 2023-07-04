@@ -1,12 +1,11 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.contract
 
 import android.content.res.AssetFileDescriptor
-import android.net.Uri
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 
 interface ShowContract {
-    interface MusicPlayerView {
+    interface ShowView {
         fun loadSuccess()
         fun load()
         fun loadFailed(e: String)
@@ -18,10 +17,12 @@ interface ShowContract {
         fun isDownload(boolean: Boolean,draw:Int)
     }
 
-    interface MusicPlayerPresenter {
-         fun isFavorite( sound:String):Boolean
-        fun checkDownLoad(nameParentSound:String,pathSound: String )
-        fun downLoad(mImg: DataImage, mSound: DataSound)
+    interface ShowPresenter {
+        fun getDataImgFavorite(  source: String): DataImage
+        fun getPositionSound( source: String): Int
+        fun getFavorite( source: String): Triple<DataImage, DataSound, Int>
+        fun isFavorite(sound: String): Boolean
+        fun downLoad(mImg: DataImage, mSound: DataSound, position: Int)
         fun setLooping(isLooping: Boolean)
         fun clickMenuPopup()
         fun clickItemMenuPopup(position: Int)
@@ -37,11 +38,13 @@ interface ShowContract {
         fun adjustVolume(volume: Int)
         fun setFavorite(isFavorite: Boolean)
         fun setRepeatInterval(intervalSeconds: Int)
-         fun handleFavoriteChecked(
+        fun handleFavoriteChecked(
             isChecked: Boolean,
             dataSound: DataSound,
             mDataImage: DataImage,
-            isDisconnect: Boolean
+             position: Int
         )
+
+        fun checkDownLoad(nameParentSound: String, pathSound: String)
     }
 }

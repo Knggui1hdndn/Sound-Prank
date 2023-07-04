@@ -3,8 +3,7 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
-import android.util.Patterns
+ import android.util.Patterns
 import android.view.View
 import android.widget.ImageView
 import androidx.core.net.toUri
@@ -41,8 +40,7 @@ object Utilities {
             loadImg(bitmap, img)
 
         } catch (e: Exception) {
-            Log.d("dddddddddssss",e.toString())
-            loadImg(url, img)
+             loadImg(url, img)
         }
 
     }

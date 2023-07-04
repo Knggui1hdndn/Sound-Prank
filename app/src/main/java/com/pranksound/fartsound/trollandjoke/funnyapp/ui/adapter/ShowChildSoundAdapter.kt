@@ -10,7 +10,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
@@ -33,13 +32,14 @@ class ShowChildSoundAdapter(
 
 
         @SuppressLint("UseCompatLoadingForDrawables")
-        fun bind(mDataImage: DataSound) {
-            Utilities.setImage(mDataImage.image, img,view.context)
-            txt.text=mDataImage.image
+        fun bind(mDataSound: DataSound) {
+            Utilities.setImage(mDataSound.image, img, view.context)
+            txt.text = mDataSound.source
+
             mView.setOnClickListener {
                 offOrHotAdapterListens.itemClick(
                     (img.drawable as BitmapDrawable).bitmap,
-                    mDataImage.source,
+                    mDataSound.source,
                     false
                 )
             }

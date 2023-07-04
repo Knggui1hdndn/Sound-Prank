@@ -2,54 +2,79 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.presenter
 
 import android.content.Context
 import android.content.res.AssetFileDescriptor
-import android.content.res.AssetManager
 import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.core.net.toUri
-import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ShowContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
-import java.io.File
-import java.io.IOException
 
 
 class ShowPresenter(
-    private val view: ShowContract.MusicPlayerView,
+    private val view: ShowContract.ShowView,
     val context: Context,
     private val listSize: Int,
-    private val apiClientPresenter: ApiClientPresenter
+    private val apiClientPresenter: ApiClientPresenter,
+    private val checkNetWork: Boolean
 ) :
-    ShowContract.MusicPlayerPresenter {
+    ShowContract.ShowPresenter {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private var mediaPlayer = MediaPlayer()
     var currentPosition = 0
+    private var isDownload = false
     private var isLooping = false
     override fun handleFavoriteChecked(
         isChecked: Boolean,
         dataSound: DataSound,
         mDataImage: DataImage,
-        isDisconnect: Boolean
+        position: Int
     ) {
         with(FileHandler) {
-            if (isDisconnect) {
+            if (isDownload) {
                 if (isChecked)
-                    saveFavoriteOff(dataSound, mDataImage, context)
+                    saveFavoriteOff(dataSound, mDataImage, context, position)
                 else
                     removeFavoriteOff(context, dataSound)
             } else {
                 if (isChecked)
-                    saveFavoriteOnl(dataSound, mDataImage, context)
+                    saveFavoriteOnl(dataSound, mDataImage, context, position)
                 else
                     removeFavoriteOnl(context, dataSound)
             }
+        }
+    }
+
+    override fun getDataImgFavorite(source: String): DataImage {
+        return getFavorite(source).first
+    }
+
+    override fun getPositionSound(source: String): Int {
+        return getFavorite(source).third
+    }
+
+    override fun getFavorite(source: String): Triple<DataImage, DataSound, Int> {
+        val sizeFavoriteOff = FileHandler.getFavoriteOff(context).size
+        val sizeFavoriteOnl = FileHandler.getFavoriteOnl(context).size
+        return if (isFavorite(source) && !checkNetWork) {
+            FileHandler.getFavoriteOff(context)[currentPosition]
+        } else {
+            if (sizeFavoriteOnl == 0) {
+                FileHandler.getFavoriteOff(context)[currentPosition]
+            }
+            if (sizeFavoriteOff == 0) {
+                FileHandler.getFavoriteOnl(context)[currentPosition]
+            }
+            if (currentPosition >= sizeFavoriteOnl) {
+                FileHandler.getFavoriteOff(context)[currentPosition - sizeFavoriteOnl]
+            } else {
+                FileHandler.getFavoriteOnl(context)[currentPosition]
+            }
+
         }
     }
 
@@ -64,6 +89,7 @@ class ShowPresenter(
 
     override fun checkDownLoad(nameParentSound: String, pathSound: String) {
         FileHandler.checkFileExists(context, nameParentSound, pathSound, currentPosition).let {
+            isDownload = it
             if (!it) {
                 view.isDownload(true, R.drawable.baseline_cloud_download_24)
             } else {
@@ -73,7 +99,7 @@ class ShowPresenter(
 
     }
 
-    override fun downLoad(mImg: DataImage, mSound: DataSound) {
+    override fun downLoad(mImg: DataImage, mSound: DataSound, position: Int) {
         try {
             apiClientPresenter.downloadStream(mSound.source) { sound ->
                 if (sound != null) {
@@ -90,10 +116,10 @@ class ShowPresenter(
                                         context,
                                         bitmapImgImage,
                                         mImg.name,
-                                        mImg.name + currentPosition
+                                        mImg.name + position
                                     )
                                     FileHandler.saveFileToAppDirectory(
-                                        sound, mImg.name, mImg.name + currentPosition, context
+                                        sound, mImg.name, mImg.name + position, context
                                     )
                                     view.downLoadSuccess()
                                 } else {

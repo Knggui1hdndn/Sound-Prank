@@ -3,7 +3,6 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -39,6 +38,8 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         setAdapterMeme(Constraints.LIST_MEME)
         binding.mRcyHot.visibility = View.VISIBLE
         binding.mRcyMeme.visibility = View.VISIBLE
+        binding.txtOff.visibility = View.GONE
+        binding.btnLoad.visibility = View.GONE
     }
 
     override fun onFailed(e: String) {
@@ -52,6 +53,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
             ListensChangeNetwork.isConnectNetwork = Constraints.CONNECTION_NETWORK
         }
         setAdapter()
+        showMess()
     }
 
     private lateinit var binding: ActivityHomeBinding
@@ -60,6 +62,8 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
     private lateinit var adapterHot: HotSoundAdapter
     private lateinit var adapterMeme: HotSoundAdapter
     private lateinit var intentFilter: IntentFilter
+    private var check = 0
+    private var checkSuccess = 0
     private lateinit var listensChangeNetwork: ListensChangeNetwork
     private lateinit var listHash: MutableList<Triple<DataImage, Boolean, List<DataSound>>>
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,14 +73,23 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         setSupportActionBar(binding.mToolBar)
         listHash = mutableListOf()
         presenter = ApiClientPresenter()
-        presenter.getListParentSound(this)
         listensChangeNetwork = ListensChangeNetwork(this)
         intentFilter = IntentFilter(Constraints.CONNECTIVITY_CHANGE)
         registerReceiver(listensChangeNetwork, intentFilter)
+        binding.btnLoad.setOnClickListener {
+            binding.mProgress.visibility = View.VISIBLE
+            presenter.getListParentSound(this)
+            binding.btnLoad.visibility = View.INVISIBLE
+        }
+        binding.txtOff.setOnClickListener {
+            recreate()
+        }
+
     }
 
 
     private fun setAdapter() {
+
         adapter = ParentSoundAdapter(listHash, presenter, this)
         val lmg = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.mRcy.layoutManager = lmg
@@ -123,14 +136,32 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         when (string) {
             Constraints.CONNECTION_NETWORK -> {
                 presenter.getListParentSound(this)
-                Utilities.showSnackBar(binding.root, "Đang load")
+                binding.txtOff.text = "Đang load"
+                binding.btnLoad.visibility = View.GONE
+                binding.txtOff.visibility = View.VISIBLE
+                check = 1
+                binding.txtOff.isEnabled=false
+
             }
 
             Constraints.DISCONNECT_NETWORK -> {
                 onFailed("lỗi")
-                Utilities.showSnackBar(binding.root, "Vui lòng kiểm tra kết nối")
+                showMess()
             }
         }
+    }
+
+    private fun showMess() {
+        if (check == 0) {
+            binding.txtOff.text = "Không có kết nối Internet \n Đang dùng off"
+            binding.txtOff.isEnabled=false
+
+        } else {
+            binding.txtOff.text = "Không có kết nối Internet \n Chuyển sang chế độ off"
+            binding.txtOff.isEnabled=true
+        }
+        binding.txtOff.visibility = View.VISIBLE
+        binding.btnLoad.visibility = View.VISIBLE
     }
 
 }
