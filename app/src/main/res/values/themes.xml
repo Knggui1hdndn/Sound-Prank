@@ -1,12 +1,21 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.PrankSound" parent="Theme.AppCompat.DayNight.NoActionBar">
-
-    </style>
+        <item name="android:textStyle">bold</item>
+     </style>
 <style name="txt_title">
+    <item name="android:fontFamily">@font/kodchasan </item>
     <item name="android:textColor">@color/black</item>
     <item name="android:textStyle">bold</item>
     <item name="android:layout_margin">20dp</item>
+    <item name="android:textSize">22sp</item>
  </style>
+
+    <style name="txt_title_sound_parent">
+        <item name="android:textColor">@color/title_sound_parent</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_margin">20dp</item>
+        <item name="android:textSize">20sp</item>
+    </style>
     <style name="Theme.PrankSound" parent="Base.Theme.PrankSound" />
 </resources>

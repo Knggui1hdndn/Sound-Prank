@@ -15,6 +15,8 @@ object Constraints {
     const val FAVORITE_Off = "FAVORITE_Off"
     const val FAVORITE_ONL = "FAVORITE_ONL"
     const val ACTIVITY_LAUNCH = "ACTIVITY_LAUNCH"
+    const val TYPE_HOT = 0
+    const val TYPE_MEME =1
     val LIST_MEME = listOf(
         DataImage(
             "636b8e5415831ec42fc7d805",

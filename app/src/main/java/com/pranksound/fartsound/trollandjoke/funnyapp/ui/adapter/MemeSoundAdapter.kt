@@ -16,22 +16,17 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
 
 
 
+class MemeSoundAdapter(   private val list: List<DataImage> ) :
+    RecyclerView.Adapter<MemeSoundAdapter.MemeAdapterListensViewHolder>() {
 
-class HotSoundAdapter(
-    private val list: List<DataImage>,
-
-    ) :
-    RecyclerView.Adapter<HotSoundAdapter.HotAdapterListensViewHolder>() {
-
-    inner class HotAdapterListensViewHolder(private val view: View) :
+    inner class MemeAdapterListensViewHolder(private val view: View) :
         RecyclerView.ViewHolder(view) {
         private var img: ImageView = view.findViewById(R.id.img)
-        private var mView: CardView = view.findViewById(R.id.mView)
 
 
         fun bind(mDataImage: DataImage) {
             Utilities.setImage(mDataImage.icon, img, view.context)
-            mView.setOnClickListener {
+            img.setOnClickListener {
                 val context = it.context
                 val intent = Intent(context, Show::class.java)
                 intent.putExtra(Constraints.PARENT_SOUND, mDataImage)
@@ -43,8 +38,8 @@ class HotSoundAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): HotAdapterListensViewHolder {
-        return HotAdapterListensViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_hot_sound, parent, false)
+    ): MemeAdapterListensViewHolder {
+        return MemeAdapterListensViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_meme_sound, parent, false)
         )
 
     }
@@ -53,7 +48,7 @@ class HotSoundAdapter(
         return list.size
     }
 
-    override fun onBindViewHolder(holder: HotAdapterListensViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MemeAdapterListensViewHolder, position: Int) {
         holder.bind(list[position])
     }
 

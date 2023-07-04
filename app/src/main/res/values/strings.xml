@@ -10,6 +10,7 @@ bring smile to your face.
 Play Offline</string>
     <string name="online_sound">
 Online Sound</string>
+    <string name="air_horn">Air Horn</string>
     <string-array name="time">
         <item>10s</item>
         <item>15s</item>

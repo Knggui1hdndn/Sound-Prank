@@ -29,11 +29,12 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ShowPresenter
-import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundAdapterListen
+ import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundClickListens
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ShowChildSoundAdapter
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.SoundChildAdapter
 
 
-class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterListen,
+class Show : AppCompatActivity(), ApiClientContract.Listens,
     ShowContract.ShowView, OnSeekBarChangeListener {
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -74,10 +75,10 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
             seekBar.max = showPresenter.getMaxVolume()
             seekBar.progress = showPresenter.getCurrentVolume()
             seekBar.setOnSeekBarChangeListener(this@Show)
-            btnNext.setOnClickListener { showPresenter.nextItem() }
-            swLoop.setOnClickListener { showPresenter.setLooping(swLoop.isChecked) }
+            imgNext.setOnClickListener { showPresenter.nextItem() }
+            imgLoop.setOnClickListener { showPresenter.setLooping(false) }
             btnTime.setOnClickListener { showPresenter.clickMenuPopup() }
-            btnPre.setOnClickListener { showPresenter.prevItem() }
+            imgPre.setOnClickListener { showPresenter.prevItem() }
             img.setOnClickListener { showPresenter.playMusic(source) }
             layoutRefresh.button.setOnClickListener { recreate() }
             imgDowload.setOnClickListener {
@@ -91,12 +92,14 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
             }
             cbFavourite.setOnClickListener {
                 showPresenter.handleFavoriteChecked(
-                    cbFavourite.isChecked,
+                false,
                     itemDataSound,
                     mDataImage,
                     currentPosition
                 )
-           if (!cbFavourite.isChecked) listPositionUnchecked.add(currentPosition) else listPositionUnchecked.remove(currentPosition)
+                if (!false) listPositionUnchecked.add(currentPosition) else listPositionUnchecked.remove(
+                    currentPosition
+                )
             }
             registerForContextMenu(btnTime)
             mRcy.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -144,9 +147,12 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
     override fun onBackPressed() {
         if (isCallingActivity) {
             val resultIntent = Intent()
-            val arrayList= arrayListOf<Int>()
-             arrayList.addAll(listPositionUnchecked)
-             resultIntent.putIntegerArrayListExtra(Constraints.POSITION_FAVORITE_UNCHECKED, arrayList )
+            val arrayList = arrayListOf<Int>()
+            arrayList.addAll(listPositionUnchecked)
+            resultIntent.putIntegerArrayListExtra(
+                Constraints.POSITION_FAVORITE_UNCHECKED,
+                arrayList
+            )
             setResult(Activity.RESULT_OK, resultIntent)
         }
         finish()
@@ -168,7 +174,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
     private fun setUpNormalActivity() {
         mDataImage = getDataImage()
         if (isDisconnect) {
-            binding.mProgress1.visibility=View.GONE
+            binding.mProgress1.visibility = View.GONE
             list = try {
                 FileHandler.getFileAssetByParentSound(this, mDataImage.name).toMutableList()
             } catch (e: Exception) {
@@ -230,7 +236,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
     }
 
     override fun isFavorite(boolean: Boolean) {
-        binding.cbFavourite.isChecked = boolean
+     //   binding.cbFavourite.isChecked = boolean
     }
 
     override fun isDownload(boolean: Boolean, draw: Int) {
@@ -267,7 +273,11 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
     }
 
     private fun setAdapter() {
-        val adapter = ShowChildSoundAdapter(this.list, this)
+        val adapter = ShowChildSoundAdapter(this.list, object : ChildSoundClickListens {
+            override fun itemClick(position: Int) {
+
+            }
+        }, "")
         binding.mRcy.apply {
             val comPosit = CompositePageTransformer()
             comPosit.addTransformer(MarginPageTransformer(30))
@@ -288,9 +298,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
         binding.mConstraint.isEnabled = true
     }
 
-    override fun itemClick(bitmap: Bitmap, linkSound: String, checkFirst: Boolean) {
-        binding.img.setImageBitmap(bitmap)
-    }
+
 
     override fun onPause() {
         super.onPause()
@@ -299,7 +307,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
 
     override fun loadSuccess() {
         binding.mProgress.visibility = View.INVISIBLE
-        
+
     }
 
     override fun load() {
@@ -309,9 +317,10 @@ class Show : AppCompatActivity(), ApiClientContract.Listens, ChildSoundAdapterLi
 
     override fun loadFailed(e: String) {
         binding.mProgress.visibility = View.INVISIBLE
-         
+
 
     }
+
     private fun ViewGroup.deepForEach(function: View.() -> Unit) {
         this.forEach { child ->
             child.function()

@@ -4,14 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:background="@drawable/background"
     tools:context=".ui.Show">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/appCompatImageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@drawable/back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@drawable/heart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/kodchasan"
+        android:text="@string/air_horn"
+        android:textColor="@color/title_sound_parent"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <include
         android:id="@+id/refresh"
         layout="@layout/refresh"
         android:visibility="gone"
-          app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,54 +56,100 @@
             android:id="@+id/mRcy"
             android:layout_width="match_parent"
             android:layout_height="200dp"
+            android:layout_marginBottom="15dp"
             android:paddingStart="80dp"
             android:paddingEnd="80dp"
             app:layout_constraintBottom_toTopOf="@+id/viewPager2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <androidx.viewpager2.widget.ViewPager2
-
+        <androidx.cardview.widget.CardView
             android:id="@+id/viewPager2"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="220dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="40dp"
+            app:cardCornerRadius="35dp"
             app:layout_constraintBottom_toTopOf="@+id/btnTime"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent">
 
 
-        </androidx.viewpager2.widget.ViewPager2>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/img"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/viewPager2"
-            app:layout_constraintEnd_toStartOf="@+id/btnNext"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/btnPre"
-            app:layout_constraintTop_toTopOf="@+id/viewPager2"
-            app:layout_constraintVertical_bias="0.0" />
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginBottom="25dp"
+                    app:cardCornerRadius="25dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/imgNext"
+                    app:layout_constraintStart_toEndOf="@+id/imgPre"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/img"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+
+
+                        tools:ignore="MissingConstraints" />
+                </androidx.cardview.widget.CardView>
+
+                <ImageView
+                    android:id="@+id/imgNext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/arrow_left"
+                    android:rotationY="181"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="MissingConstraints" />
+
+                <ImageView
+                    android:id="@+id/imgPre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/arrow_left"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="MissingConstraints" />
+
+                <ProgressBar
+                    android:id="@+id/mProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
 
         <ImageView
             android:id="@+id/imgDowload"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@drawable/baseline_cloud_download_24"
-            app:layout_constraintEnd_toEndOf="@+id/img"
-            app:layout_constraintTop_toTopOf="@+id/viewPager2" />
-
-        <ProgressBar
-            android:id="@+id/mProgress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="@+id/viewPager2"
-            app:layout_constraintEnd_toEndOf="@+id/img"
-            app:layout_constraintStart_toStartOf="@+id/img"
-            app:layout_constraintTop_toTopOf="@+id/viewPager2" />
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="40dp"
+
+            android:background="@drawable/download_24px"
+            app:layout_constraintBottom_toTopOf="@+id/seekBar"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <ProgressBar
             android:id="@+id/mProgress1"
@@ -88,56 +162,50 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/btnPre"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pre"
-            app:layout_constraintBottom_toBottomOf="@+id/viewPager2"
-            app:layout_constraintStart_toStartOf="@id/viewPager2"
-            app:layout_constraintTop_toTopOf="@id/viewPager2" />
 
-        <Button
-            android:id="@+id/btnNext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Next"
-            app:layout_constraintBottom_toBottomOf="@+id/viewPager2"
-            app:layout_constraintEnd_toEndOf="@id/viewPager2"
-            app:layout_constraintTop_toTopOf="@id/viewPager2" />
-
-        <Button
+        <ImageView
             android:id="@+id/btnTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Time"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/time"
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <CheckBox
+        <ImageView
             android:id="@+id/cbFavourite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Favourite"
+            android:background="@drawable/favorite"
+            android:layout_marginBottom="40dp"
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
-            app:layout_constraintEnd_toStartOf="@+id/swLoop"
-            app:layout_constraintStart_toEndOf="@+id/btnTime"
-            app:layout_constraintTop_toBottomOf="@+id/viewPager2" />
+            app:layout_constraintEnd_toStartOf="@+id/imgLoop"
+            app:layout_constraintStart_toEndOf="@+id/btnTime" />
 
-        <Switch
-            android:id="@+id/swLoop"
+        <ImageView
+            android:id="@+id/imgLoop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
 
+            android:background="@drawable/loop"
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/viewPager2"
+            app:layout_constraintHorizontal_bias="0.635"
+            app:layout_constraintStart_toEndOf="@+id/btnTime"
+            app:layout_constraintVertical_bias="0.0"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <SeekBar
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:layout_marginTop="20dp"
             app:layout_constraintBottom_toBottomOf="parent" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

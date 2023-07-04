@@ -1,71 +1,52 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter
 
-import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.pranksound.fartsound.trollandjoke.funnyapp.R
+import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ItemHotSound1Binding
+import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ItemSoundChildBinding
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
 
 
-interface  ChildSoundAdapterListen {
-    fun itemClick(bitmap: Bitmap, linkSound: String, checkFirst: Boolean)
-}
-
 class ShowChildSoundAdapter(
-    private val list: List<DataSound>,
-     val offOrHotAdapterListens: ChildSoundAdapterListen
+    private var list: List<DataSound>,
+    private val childSoundClickListens: ChildSoundClickListens,
+    private val titleSoundParent:String
 ) :
-    RecyclerView.Adapter<ShowChildSoundAdapter.HotAdapterListensViewHolder>() {
-
-    inner class HotAdapterListensViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
-        private var img: ImageView = view.findViewById(R.id.img)
-        private var mView: CardView = view.findViewById(R.id.mView)
-        private var txt: TextView = view.findViewById(R.id.txt)
-
-
-        @SuppressLint("UseCompatLoadingForDrawables")
-        fun bind(mDataSound: DataSound) {
-            Utilities.setImage(mDataSound.image, img, view.context)
-            txt.text = mDataSound.source
-
-            mView.setOnClickListener {
-                offOrHotAdapterListens.itemClick(
-                    (img.drawable as BitmapDrawable).bitmap,
-                    mDataSound.source,
-                    false
-                )
+    RecyclerView.Adapter<ShowChildSoundAdapter.ChildSoundViewHolder>() {
+    fun setData(list: List<DataSound>){
+        this.list=list
+        notifyDataSetChanged()
+    }
+    inner class ChildSoundViewHolder(val binding: ItemHotSound1Binding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(dataSound: DataSound, position: Int) {
+            binding.txtName.text= "$titleSoundParent $position"
+            binding.cardView.backgroundTintList= ColorStateList.valueOf(Utilities.getRandomColor())
+            Utilities.setImage(dataSound.image, binding.img, binding.root.context)
+            binding.img.setOnClickListener {
+                childSoundClickListens.itemClick(position)
             }
         }
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): HotAdapterListensViewHolder {
-        return HotAdapterListensViewHolder(
-            LayoutInflater.from(parent.context).inflate(
-                R.layout.item_hot_sound_1  ,
-                parent, false
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChildSoundViewHolder {
+        return ChildSoundViewHolder(
+            ItemHotSound1Binding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
             )
         )
-
     }
 
     override fun getItemCount(): Int {
         return list.size
     }
 
-    override fun onBindViewHolder(holder: HotAdapterListensViewHolder, position: Int) {
-        holder.bind(list[position])
-     }
-
-
+    override fun onBindViewHolder(holder: ChildSoundViewHolder, position: Int) {
+        holder.bind(list[position], position)
+    }
 }

@@ -16,13 +16,13 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ActivityFavoriteBinding
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
-import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundAdapter
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.SoundChildAdapter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundClickListens
 
 
 class Favorite : AppCompatActivity(), ChildSoundClickListens {
     private lateinit var favorite: ActivityFavoriteBinding
-    private lateinit var adapterFavorite: ChildSoundAdapter
+    private lateinit var adapterFavorite: SoundChildAdapter
     private lateinit var listSound: MutableList<DataSound>
     private   var checkNetwork: Boolean=false
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +65,7 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
     }
 
     private fun setAdapter() {
-        adapterFavorite = ChildSoundAdapter(listSound, this)
+        adapterFavorite = SoundChildAdapter(listSound, this,"" )
         favorite.mRcy.apply {
             layoutManager = GridLayoutManager(this@Favorite, 2)
             adapter = adapterFavorite

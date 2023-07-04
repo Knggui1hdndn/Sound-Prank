@@ -1,11 +1,18 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.TypefaceSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
@@ -19,8 +26,10 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.HotSoundAdapter
-import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ParentSoundAdapter
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.MemeSoundAdapter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.RecyclerView
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.SoundParentAdapter
+
 
 class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, ListenNetwork {
     override fun onSuccess(list: List<Any>) {
@@ -45,11 +54,11 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
     override fun onFailed(e: String) {
         binding.mProgress.visibility = View.GONE
         Utilities.showSnackBar(binding.root, "Vui lòng kiểm tra kết nối")
-        if (listHash.size ==0){
+        if (listHash.size == 0) {
             ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
             listHash.addAll(FileHandler.getAllFileAsset(this).toMutableList())
             listHash.addAll(FileHandler.getDataSoundChildFromInternalStorage(this, null))
-        }else{
+        } else {
             ListensChangeNetwork.isConnectNetwork = Constraints.CONNECTION_NETWORK
         }
         setAdapter()
@@ -58,18 +67,29 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var presenter: ApiClientPresenter
-    private lateinit var adapter: ParentSoundAdapter
+    private lateinit var adapter: SoundParentAdapter
     private lateinit var adapterHot: HotSoundAdapter
-    private lateinit var adapterMeme: HotSoundAdapter
+    private lateinit var adapterMeme: MemeSoundAdapter
     private lateinit var intentFilter: IntentFilter
-    private var check = 0
-    private var checkSuccess = 0
     private lateinit var listensChangeNetwork: ListensChangeNetwork
     private lateinit var listHash: MutableList<Triple<DataImage, Boolean, List<DataSound>>>
+
+    @SuppressLint("NewApi")
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        //val typeFace = Typeface.create(resources.getFont(R.font.kodchasan), Typeface.BOLD)
+        //        val toolbarTitle = SpannableString(binding.mToolBar.title)
+        //        val toolbarTypefaceSpan = TypefaceSpan(typeFace)
+        //        toolbarTitle.setSpan(
+        //            toolbarTypefaceSpan,
+        //            0,
+        //            toolbarTitle.length,
+        //            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+        //        )
+        //        binding.mToolBar.title = toolbarTitle
         setSupportActionBar(binding.mToolBar)
         listHash = mutableListOf()
         presenter = ApiClientPresenter()
@@ -89,15 +109,14 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
 
 
     private fun setAdapter() {
-
-        adapter = ParentSoundAdapter(listHash, presenter, this)
+        adapter = SoundParentAdapter(listHash, presenter, this)
         val lmg = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.mRcy.layoutManager = lmg
         binding.mRcy.adapter = adapter
     }
 
     private fun setAdapterMeme(lists: List<DataImage>) {
-        adapterMeme = HotSoundAdapter(lists)
+        adapterMeme = MemeSoundAdapter(lists)
         val lmg = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.mRcyMeme.layoutManager = lmg
         binding.mRcyMeme.adapter = adapterMeme
@@ -117,7 +136,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         try {
             adapter.setData(listHash)
         } catch (e: Exception) {
-         }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -139,9 +158,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
                 binding.txtOff.text = "Đang load"
                 binding.btnLoad.visibility = View.GONE
                 binding.txtOff.visibility = View.VISIBLE
-                check = 1
-                binding.txtOff.isEnabled=false
-
+                binding.txtOff.isEnabled = false
             }
 
             Constraints.DISCONNECT_NETWORK -> {
@@ -152,14 +169,14 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
     }
 
     private fun showMess() {
-        if (check == 0) {
+        if (listHash.size < 50) {
             binding.txtOff.text = "Không có kết nối Internet \n Đang dùng off"
-            binding.txtOff.isEnabled=false
-
+            binding.txtOff.isEnabled = false
         } else {
             binding.txtOff.text = "Không có kết nối Internet \n Chuyển sang chế độ off"
-            binding.txtOff.isEnabled=true
+            binding.txtOff.isEnabled = true
         }
+
         binding.txtOff.visibility = View.VISIBLE
         binding.btnLoad.visibility = View.VISIBLE
     }

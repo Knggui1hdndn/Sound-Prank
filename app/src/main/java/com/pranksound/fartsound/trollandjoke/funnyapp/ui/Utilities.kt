@@ -3,16 +3,22 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
- import android.util.Patterns
+import android.graphics.Color
+import android.util.Patterns
 import android.view.View
 import android.widget.ImageView
 import androidx.core.net.toUri
 import com.google.android.material.snackbar.Snackbar
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.squareup.picasso.Picasso
+import java.util.Random
+
 
 object Utilities {
-
+    fun getRandomColor(): Int {
+        val rnd = Random()
+        return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+    }
     fun loadImg(url: String, img: ImageView) {
 
 
