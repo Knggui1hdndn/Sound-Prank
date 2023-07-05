@@ -8,7 +8,7 @@
     tools:context=".ui.Show">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/appCompatImageView2"
+        android:id="@+id/imgBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
@@ -20,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
+        android:id="@+id/imgFavorite"
         android:background="@drawable/heart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,6 +30,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/kodchasan"
         android:text="@string/air_horn"
+        android:id="@+id/txtTitleSoundChild"
         android:textColor="@color/title_sound_parent"
         android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -174,23 +176,23 @@
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <ImageView
+        <CheckBox
             android:id="@+id/cbFavourite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/favorite"
-            android:layout_marginBottom="40dp"
+             android:layout_marginBottom="40dp"
+            android:button="@drawable/checkbox_favorite"
+
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
-            app:layout_constraintEnd_toStartOf="@+id/imgLoop"
+            app:layout_constraintEnd_toStartOf="@+id/cbLoop"
             app:layout_constraintStart_toEndOf="@+id/btnTime" />
 
-        <ImageView
-            android:id="@+id/imgLoop"
+        <CheckBox
+            android:id="@+id/cbLoop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
-
-            android:background="@drawable/loop"
+android:button="@drawable/checkbox_loop"
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.635"

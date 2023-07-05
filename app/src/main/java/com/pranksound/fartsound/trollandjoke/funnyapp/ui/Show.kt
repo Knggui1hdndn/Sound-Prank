@@ -3,7 +3,6 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +16,7 @@ import androidx.core.view.forEach
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
+import com.prank.ShowChildSoundAdapter
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
@@ -29,9 +29,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ShowPresenter
- import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundClickListens
-import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ShowChildSoundAdapter
-import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.SoundChildAdapter
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundClickListens
 
 
 class Show : AppCompatActivity(), ApiClientContract.Listens,
@@ -49,7 +47,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
 
     }
 
-    private lateinit var list: MutableList<DataSound>
+    private   var list: MutableList<DataSound> =mutableListOf()
     private lateinit var binding: ActivityShowBinding
     private var isDownload: Boolean = false
     private lateinit var itemDataSound: DataSound
@@ -72,14 +70,17 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
         setContentView(binding.root)
         setUpActivity()
         with(binding) {
+            txtTitleSoundChild.text=mDataImage.name
             seekBar.max = showPresenter.getMaxVolume()
             seekBar.progress = showPresenter.getCurrentVolume()
             seekBar.setOnSeekBarChangeListener(this@Show)
             imgNext.setOnClickListener { showPresenter.nextItem() }
-            imgLoop.setOnClickListener { showPresenter.setLooping(false) }
+            cbLoop.setOnClickListener { showPresenter.setLooping(cbLoop.isChecked) }
             btnTime.setOnClickListener { showPresenter.clickMenuPopup() }
             imgPre.setOnClickListener { showPresenter.prevItem() }
             img.setOnClickListener { showPresenter.playMusic(source) }
+            imgBack.setOnClickListener { finish() }
+            imgFavorite.setOnClickListener {   startActivity(Intent(this@Show, Favorite::class.java)) }
             layoutRefresh.button.setOnClickListener { recreate() }
             imgDowload.setOnClickListener {
                 var position = currentPosition
@@ -91,36 +92,43 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
                 binding.mProgress1.visibility = View.VISIBLE
             }
             cbFavourite.setOnClickListener {
+                val isCheckedFavorite=cbFavourite.isChecked
                 showPresenter.handleFavoriteChecked(
-                false,
+                    isCheckedFavorite,
                     itemDataSound,
                     mDataImage,
                     currentPosition
                 )
-                if (!false) listPositionUnchecked.add(currentPosition) else listPositionUnchecked.remove(
-                    currentPosition
-                )
+                if (!isCheckedFavorite)
+                    listPositionUnchecked.add(currentPosition)
+                else
+                    listPositionUnchecked.remove(currentPosition)
             }
             registerForContextMenu(btnTime)
             mRcy.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                @SuppressLint("UseCompatLoadingForDrawables")
                 override fun onPageScrolled(
                     position: Int, positionOffset: Float, positionOffsetPixels: Int
                 ) {
-                    currentPosition = position
-                    showPresenter.currentPosition = currentPosition
-                    if (list.size > 0) {
-                        itemDataSound = list[currentPosition]
-                        source = itemDataSound.source
-                        if (isCallingActivity) {
-                            mDataImage = showPresenter.getDataImgFavorite(source)
-                        }
-                        showPresenter.isFavorite(source)
-                        showPresenter.checkDownLoad(mDataImage.name, source)
-                        setImage()
-                    }
+                    handlePageScrolled(position)
                 }
             })
+        }
+    }
+
+    private fun handlePageScrolled(position: Int) {
+        currentPosition = position
+        with(showPresenter) {
+            currentPosition = position
+            if (list.size > 0) {
+                itemDataSound = list[position]
+                source = itemDataSound.source
+                if (isCallingActivity) {
+                    mDataImage = getDataImgFavorite(source)
+                }
+                isFavorite(source)
+                checkDownLoad(mDataImage.name, source)
+                setImage()
+            }
         }
     }
 
@@ -129,12 +137,10 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
         binding.mConstraint.isEnabled = false
         apiClientPresenter = ApiClientPresenter()
         showPresenter = ShowPresenter(this, this, 0, apiClientPresenter, checkNetWork)
-        list = mutableListOf()
         isDisconnect = ListensChangeNetwork.isConnectNetwork == Constraints.DISCONNECT_NETWORK
-        binding.mConstraint.isEnabled = false
-        val intent = intent
-        callingActivity = intent.getStringExtra(Constraints.ACTIVITY_LAUNCH).toString()
+        val callingActivity = intent.getStringExtra(Constraints.ACTIVITY_LAUNCH).toString()
         isCallingActivity = callingActivity == "Favorite"
+
         if (isCallingActivity) {
             binding.mProgress1.visibility = View.GONE
             setUpFavoriteActivity(intent)
@@ -159,6 +165,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
     }
 
     private fun setUpFavoriteActivity(intent: Intent) {
+
         checkNetWork = intent.getBooleanExtra("checkNetwork", false)
         checkFavorite = true
         currentPosition = intent.getIntExtra(Constraints.SOUND_CHILD_CLICK, 0)
@@ -168,29 +175,34 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
             list.addAll(FileHandler.getFavoriteOnl(this).map { it.second })
             list.addAll(FileHandler.getFavoriteOff(this).map { it.second })
         }
+        mDataImage=showPresenter.getDataImgFavorite(list[currentPosition].source)
         setAdapter()
     }
 
     private fun setUpNormalActivity() {
         mDataImage = getDataImage()
-        if (isDisconnect) {
-            binding.mProgress1.visibility = View.GONE
-            list = try {
-                FileHandler.getFileAssetByParentSound(this, mDataImage.name).toMutableList()
-            } catch (e: Exception) {
-                FileHandler.getDataSoundChildFromInternalStorage(
-                    this,
-                    mDataImage.name
-                )[0].third.toMutableList()
-            }
-            setAdapter()
+         if (isDisconnect) {
+            setUpListDisconnected()
         } else {
-            apiClientPresenter.getListChildSound(mDataImage.id, this)
+            setUpListConnected ()
         }
         check = ListensChangeNetwork.isConnectNetwork
-        if (check == Constraints.DISCONNECT_NETWORK) binding.imgDowload.visibility = View.GONE
     }
 
+    private fun setUpListDisconnected () {
+        try {
+            list = FileHandler.getFileAssetByParentSound(this, mDataImage.name).toMutableList()
+        } catch (e: Exception) {
+            list = FileHandler.getDataSoundChildFromInternalStorage(this, mDataImage.name)[0].third.toMutableList()
+        }
+
+        binding.mProgress1.visibility = View.GONE
+        setAdapter()
+    }
+
+    private fun setUpListConnected() {
+        apiClientPresenter.getListChildSound(mDataImage.id, this)
+    }
 
     override fun showMenuPopup() {
         val popupMenu = PopupMenu(this, binding.btnTime)
@@ -220,7 +232,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
             )
         }
         source = dataSoundChildList[0].third[dataSoundChild - 1].source
-        binding.imgDowload.setImageDrawable(getDrawable(R.drawable.baseline_cloud_done_24))
+        binding.imgDowload.setBackgroundResource( R.drawable.baseline_cloud_done_24)
         binding.imgDowload.isEnabled = false
         binding.mProgress1.visibility = View.INVISIBLE
 
@@ -229,23 +241,21 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun dowLoadFailed(e: String) {
-        binding.imgDowload.setImageDrawable(getDrawable(R.drawable.baseline_cloud_download_24))
+        binding.imgDowload.setBackgroundResource( R.drawable.download_24px )
         binding.imgDowload.isEnabled = true
         binding.mProgress1.visibility = View.INVISIBLE
         Utilities.showSnackBar(binding.root, e)
     }
 
     override fun isFavorite(boolean: Boolean) {
-     //   binding.cbFavourite.isChecked = boolean
+          binding.cbFavourite.isChecked = boolean
     }
 
     override fun isDownload(boolean: Boolean, draw: Int) {
         isDownload = boolean
         with(binding) {
-            imgDowload.setImageResource(draw)
+            imgDowload.setBackgroundResource(draw)
             imgDowload.isEnabled = boolean
-
-
         }
     }
 
@@ -273,11 +283,13 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
     }
 
     private fun setAdapter() {
-        val adapter = ShowChildSoundAdapter(this.list, object : ChildSoundClickListens {
+
+        val listName=intent.getStringArrayListExtra("listName")
+        val adapter = ShowChildSoundAdapter(this.list,listName, object : ChildSoundClickListens {
             override fun itemClick(position: Int) {
 
             }
-        }, "")
+        }, mDataImage.name)
         binding.mRcy.apply {
             val comPosit = CompositePageTransformer()
             comPosit.addTransformer(MarginPageTransformer(30))
@@ -299,7 +311,6 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
     }
 
 
-
     override fun onPause() {
         super.onPause()
         showPresenter.pauseMusic()
@@ -317,8 +328,6 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
 
     override fun loadFailed(e: String) {
         binding.mProgress.visibility = View.INVISIBLE
-
-
     }
 
     private fun ViewGroup.deepForEach(function: View.() -> Unit) {

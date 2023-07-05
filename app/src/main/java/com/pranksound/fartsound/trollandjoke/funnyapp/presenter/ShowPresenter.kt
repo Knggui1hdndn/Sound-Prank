@@ -91,7 +91,7 @@ class ShowPresenter(
         FileHandler.checkFileExists(context, nameParentSound, pathSound, currentPosition).let {
             isDownload = it
             if (!it) {
-                view.isDownload(true, R.drawable.baseline_cloud_download_24)
+                view.isDownload(true, R.drawable.download_24px)
             } else {
                 view.isDownload(false, R.drawable.baseline_cloud_done_24)
             }

@@ -3,7 +3,6 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,15 +15,21 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ActivityFavoriteBinding
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
-import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.SoundChildAdapter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundClickListens
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.SoundChildFavoriteAdapter
 
 
 class Favorite : AppCompatActivity(), ChildSoundClickListens {
     private lateinit var favorite: ActivityFavoriteBinding
-    private lateinit var adapterFavorite: SoundChildAdapter
+    private lateinit var adapterFavorite: SoundChildFavoriteAdapter
     private lateinit var listSound: MutableList<DataSound>
-    private   var checkNetwork: Boolean=false
+    private var listNameSound: ArrayList<String> = arrayListOf()
+    private var listOnl: List<DataSound> = arrayListOf()
+    private var listOff: List<DataSound> = arrayListOf()
+    private var listPosition: ArrayList<Int> = arrayListOf()
+    private var checkNetwork: Boolean = false
+    val combinedList = arrayListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         favorite = ActivityFavoriteBinding.inflate(layoutInflater)
@@ -32,40 +37,69 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
         listSound = mutableListOf()
         setAdapter()
         val apiClient = ApiClientPresenter()
+        val favoriteOnlList = FileHandler.getFavoriteOnl(this@Favorite)
+        val favoriteOffList = FileHandler.getFavoriteOff(this@Favorite)
+
+        listOnl = favoriteOnlList.map { it.second }
+        listOff = favoriteOffList.map { it.second }
+        listNameSound.addAll(favoriteOnlList.map { it.first.name } + favoriteOffList.map { it.first.name })
+        listPosition.addAll(favoriteOnlList.map { it.third } + favoriteOffList.map { it.third })
+
+
+        for (i in 0 until minOf(listNameSound.size, listPosition.size)) {
+            val elementA = listPosition[i].toString()
+            val elementB = listNameSound[i]
+            val combinedElement = elementB + " " + elementA
+            combinedList.add(combinedElement)
+        }
         apiClient.getListParentSound(object : ApiClientContract.Listens {
             override fun onSuccess(list: List<Any>) {
-                checkNetwork=true
-                ListensChangeNetwork.isConnectNetwork=Constraints.CONNECTION_NETWORK
-                favorite.mProgress.visibility=View.GONE
-                listSound.addAll(FileHandler.getFavoriteOnl(this@Favorite).map { it.second })
-                listSound.addAll(FileHandler.getFavoriteOff(this@Favorite).map { it.second })
-                setAdapter()
+                handleSuccess(list, listOnl, listOff)
             }
 
             override fun onFailed(e: String) {
-                checkNetwork = false
-                ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
-                favorite.mProgress.visibility = View.GONE
-                listSound.addAll(FileHandler.getFavoriteOff(this@Favorite).map { it.second })
-                setAdapter()
+                handleFailure(listOff)
             }
-
         })
+
+
+    }
+
+    private fun handleSuccess(
+        list: List<Any>,
+        favoriteOnlList: List<DataSound>,
+        favoriteOffList: List<DataSound>
+    ) {
+        checkNetwork = true
+        ListensChangeNetwork.isConnectNetwork = Constraints.CONNECTION_NETWORK
+        favorite.mProgress.visibility = View.GONE
+        listSound.addAll(listOnl)
+        listSound.addAll(listOff)
+        setAdapter()
+    }
+
+    private fun handleFailure(favoriteOffList: List<DataSound>) {
+        checkNetwork = false
+        ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
+        favorite.mProgress.visibility = View.GONE
+        listSound.addAll(listOff)
+        setAdapter()
     }
 
     private val startForResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            result.data!!.getIntegerArrayListExtra(Constraints.POSITION_FAVORITE_UNCHECKED)?.forEach {
-                listSound.removeAt(it)
-            }
+            result.data!!.getIntegerArrayListExtra(Constraints.POSITION_FAVORITE_UNCHECKED)
+                ?.forEach {
+                    listSound.removeAt(it)
+                }
             adapterFavorite.setData(listSound)
         }
     }
 
     private fun setAdapter() {
-        adapterFavorite = SoundChildAdapter(listSound, this,"" )
+        adapterFavorite = SoundChildFavoriteAdapter(listSound, combinedList, this)
         favorite.mRcy.apply {
             layoutManager = GridLayoutManager(this@Favorite, 2)
             adapter = adapterFavorite
@@ -77,6 +111,7 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
         intent.putExtra(Constraints.ACTIVITY_LAUNCH, "Favorite")
         intent.putExtra("sound", listSound[position].source)
         intent.putExtra("checkNetwork", checkNetwork)
+        intent.putStringArrayListExtra("listName", combinedList)
         intent.putExtra(Constraints.SOUND_CHILD_CLICK, position)
         startForResult.launch(intent)
     }

@@ -11,6 +11,12 @@ Play Offline</string>
     <string name="online_sound">
 Online Sound</string>
     <string name="air_horn">Air Horn</string>
+    <string name="your_favorite">Your Favorite</string>
+    <string name="premium">Premium</string>
+    <string name="rate_us">Rate Us</string>
+    <string name="invite_friend">Invite Friend</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="setting">Setting</string>
     <string-array name="time">
         <item>10s</item>
         <item>15s</item>

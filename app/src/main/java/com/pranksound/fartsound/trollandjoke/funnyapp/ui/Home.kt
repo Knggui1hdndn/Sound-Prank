@@ -145,9 +145,11 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.favourite) {
-            startActivity(Intent(this, Favorite::class.java))
+        when(item.itemId){
+            R.id.favourite-> startActivity(Intent(this, Favorite::class.java))
+            R.id.setting-> startActivity(Intent(this , Setting::class.java))
         }
+
         return true
     }
 
