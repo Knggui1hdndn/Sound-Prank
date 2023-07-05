@@ -37,6 +37,12 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
         listSound = mutableListOf()
         setAdapter()
         val apiClient = ApiClientPresenter()
+        favorite.imgBack.setOnClickListener{
+            finish()
+        }
+
+
+
         val favoriteOnlList = FileHandler.getFavoriteOnl(this@Favorite)
         val favoriteOffList = FileHandler.getFavoriteOff(this@Favorite)
 

@@ -17,20 +17,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imgFavorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:id="@+id/imgFavorite"
         android:background="@drawable/heart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/txtTitleSoundChild"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/kodchasan"
         android:text="@string/air_horn"
-        android:id="@+id/txtTitleSoundChild"
         android:textColor="@color/title_sound_parent"
         android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,14 +95,19 @@
                     app:layout_constraintEnd_toStartOf="@+id/imgNext"
                     app:layout_constraintStart_toEndOf="@+id/imgPre"
                     app:layout_constraintTop_toTopOf="parent">
-
                     <ImageView
                         android:id="@+id/img"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-
-
                         tools:ignore="MissingConstraints" />
+                    <ProgressBar
+                        android:id="@+id/mProgress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:visibility="invisible" />
+
+
                 </androidx.cardview.widget.CardView>
 
                 <ImageView
@@ -127,16 +132,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="MissingConstraints" />
-
-                <ProgressBar
-                    android:id="@+id/mProgress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -180,7 +175,7 @@
             android:id="@+id/cbFavourite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-             android:layout_marginBottom="40dp"
+            android:layout_marginBottom="40dp"
             android:button="@drawable/checkbox_favorite"
 
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
@@ -192,7 +187,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
-android:button="@drawable/checkbox_loop"
+            android:button="@drawable/checkbox_loop"
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.635"
@@ -204,8 +199,8 @@ android:button="@drawable/checkbox_loop"
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="40dp"
             app:layout_constraintBottom_toBottomOf="parent" />
 
 

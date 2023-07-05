@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
+import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
 
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ItemSoundParentBinding
@@ -17,6 +18,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
 import kotlin.properties.Delegates
 
 interface RecyclerView {
@@ -29,6 +31,9 @@ class SoundParentAdapter(
     val click: com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.RecyclerView,
 
     ) : RecyclerView.Adapter<SoundParentAdapter.SoundParentViewHolder>() {
+    companion object {
+        var SIZE = 0
+    }
 
     inner class SoundParentViewHolder(val binding: ItemSoundParentBinding) :
         RecyclerView.ViewHolder(binding.root), ChildSoundClickListens {
@@ -48,6 +53,7 @@ class SoundParentAdapter(
                 if (isChecked && listDataSound.isNotEmpty()) {
                     showChildSound(listDataSound, mDataImage, isChecked, position)
                 }
+                mRcy.visibility = if (isChecked) View.VISIBLE else View.GONE
                 mConstraint.setOnClickListener {
                     isChecked = !isChecked
                     onShowProgress(listDataSound)
@@ -60,7 +66,8 @@ class SoundParentAdapter(
         }
 
         private fun onShowProgress(listDataSound: List<DataSound>) {
-            if (listDataSound.isEmpty()) binding.mProgress.visibility = if (isChecked) View.VISIBLE else View.GONE
+            if (listDataSound.isEmpty()) binding.mProgress.visibility =
+                if (isChecked) View.VISIBLE else View.GONE
         }
 
         fun clearChildAdapter() {
@@ -104,8 +111,8 @@ class SoundParentAdapter(
                 }
 
                 override fun onFailed(e: String) {
-                    binding.mProgress.visibility=View.GONE
-                    Toast.makeText(context, e, Toast.LENGTH_SHORT).show()
+                    binding.mProgress.visibility = View.GONE
+                    Utilities.showSnackBar(binding.root,context.getString(R.string.please_check_network))
                     isChecked = !isChecked
                 }
             })

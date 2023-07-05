@@ -14,7 +14,7 @@ interface ShowContract {
         fun downLoadSuccess()
         fun dowLoadFailed(e:String)
         fun isFavorite(boolean: Boolean)
-        fun isDownload(boolean: Boolean,draw:Int)
+        fun isDownload(boolean: Boolean, draw: Int, s: String, position: Int)
     }
 
     interface ShowPresenter {
@@ -45,6 +45,6 @@ interface ShowContract {
              position: Int
         )
 
-        fun checkDownLoad(nameParentSound: String, pathSound: String)
+        fun checkDownLoad(nameParentSound: String, pathSound: String, position: Int)
     }
 }

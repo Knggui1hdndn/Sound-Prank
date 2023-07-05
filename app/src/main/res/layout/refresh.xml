@@ -8,19 +8,25 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Vui lòng kiểm tra lại mạng"
+        android:text="@string/please_check_network"
         android:layout_marginBottom="20dp"
+        android:textColor="#FF0000"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tải lại"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:background="@drawable/background"
+        android:drawableStart="@drawable/baseline_refresh_24"
+        android:padding="5dp"
+        android:text="Refresh"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

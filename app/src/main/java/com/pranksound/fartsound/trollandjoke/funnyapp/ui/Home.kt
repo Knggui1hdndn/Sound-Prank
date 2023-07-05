@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.TypefaceSpan
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -49,17 +50,17 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         binding.mRcyMeme.visibility = View.VISIBLE
         binding.txtOff.visibility = View.GONE
         binding.btnLoad.visibility = View.GONE
+        ListensChangeNetwork.isConnectNetwork = Constraints.CONNECTION_NETWORK
     }
 
     override fun onFailed(e: String) {
+        ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
+
         binding.mProgress.visibility = View.GONE
-        Utilities.showSnackBar(binding.root, "Vui lòng kiểm tra kết nối")
+        Utilities.showSnackBar(binding.root, getString(R.string.please_check_network))
         if (listHash.size == 0) {
-            ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
             listHash.addAll(FileHandler.getAllFileAsset(this).toMutableList())
             listHash.addAll(FileHandler.getDataSoundChildFromInternalStorage(this, null))
-        } else {
-            ListensChangeNetwork.isConnectNetwork = Constraints.CONNECTION_NETWORK
         }
         setAdapter()
         showMess()
@@ -102,6 +103,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
             binding.btnLoad.visibility = View.INVISIBLE
         }
         binding.txtOff.setOnClickListener {
+            listHash.clear()
             recreate()
         }
 
@@ -109,6 +111,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
 
 
     private fun setAdapter() {
+        SoundParentAdapter.SIZE = listHash.size
         adapter = SoundParentAdapter(listHash, presenter, this)
         val lmg = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.mRcy.layoutManager = lmg
@@ -132,8 +135,10 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
 
 
     override fun itemClick(triple: Triple<DataImage, Boolean, List<DataSound>>, position: Int) {
-        listHash[position] = triple
+
+
         try {
+            listHash[position] = triple
             adapter.setData(listHash)
         } catch (e: Exception) {
         }
@@ -145,9 +150,9 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.favourite-> startActivity(Intent(this, Favorite::class.java))
-            R.id.setting-> startActivity(Intent(this , Setting::class.java))
+        when (item.itemId) {
+            R.id.favourite -> startActivity(Intent(this, Favorite::class.java))
+            R.id.setting -> startActivity(Intent(this, Setting::class.java))
         }
 
         return true
@@ -157,7 +162,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         when (string) {
             Constraints.CONNECTION_NETWORK -> {
                 presenter.getListParentSound(this)
-                binding.txtOff.text = "Đang load"
+                binding.txtOff.text = getString(R.string.loading)
                 binding.btnLoad.visibility = View.GONE
                 binding.txtOff.visibility = View.VISIBLE
                 binding.txtOff.isEnabled = false
@@ -166,16 +171,17 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
             Constraints.DISCONNECT_NETWORK -> {
                 onFailed("lỗi")
                 showMess()
+                ListensChangeNetwork.isConnectNetwork = string
             }
         }
     }
 
     private fun showMess() {
         if (listHash.size < 50) {
-            binding.txtOff.text = "Không có kết nối Internet \n Đang dùng off"
+            binding.txtOff.text = getString(R.string.currently_off)
             binding.txtOff.isEnabled = false
         } else {
-            binding.txtOff.text = "Không có kết nối Internet \n Chuyển sang chế độ off"
+            binding.txtOff.text = getString(R.string.no_internet_off)
             binding.txtOff.isEnabled = true
         }
 

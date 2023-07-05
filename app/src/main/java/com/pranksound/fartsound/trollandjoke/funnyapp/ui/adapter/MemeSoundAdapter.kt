@@ -30,6 +30,7 @@ class MemeSoundAdapter(   private val list: List<DataImage> ) :
                 val context = it.context
                 val intent = Intent(context, Show::class.java)
                 intent.putExtra(Constraints.PARENT_SOUND, mDataImage)
+
                 context.startActivity(intent)
             }
         }

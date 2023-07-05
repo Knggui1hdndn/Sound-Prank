@@ -8,8 +8,10 @@ import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
 import androidx.core.net.toUri
+import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
+import com.pranksound.fartsound.trollandjoke.funnyapp.broadcast.ListensChangeNetwork
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ShowContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
@@ -20,7 +22,6 @@ class ShowPresenter(
     val context: Context,
     private val listSize: Int,
     private val apiClientPresenter: ApiClientPresenter,
-    private val checkNetWork: Boolean
 ) :
     ShowContract.ShowPresenter {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -60,8 +61,12 @@ class ShowPresenter(
     override fun getFavorite(source: String): Triple<DataImage, DataSound, Int> {
         val sizeFavoriteOff = FileHandler.getFavoriteOff(context).size
         val sizeFavoriteOnl = FileHandler.getFavoriteOnl(context).size
-        return if (isFavorite(source) && !checkNetWork) {
-            FileHandler.getFavoriteOff(context)[currentPosition]
+        return if (isFavorite(source) && ListensChangeNetwork.isConnectNetwork != Constraints.CONNECTION_NETWORK) {
+            try {
+                FileHandler.getFavoriteOff(context)[currentPosition]
+            } catch (e: Exception) {
+                FileHandler.getFavoriteOnl(context)[currentPosition]
+            }
         } else {
             if (sizeFavoriteOnl == 0) {
                 FileHandler.getFavoriteOff(context)[currentPosition]
@@ -87,16 +92,16 @@ class ShowPresenter(
     }
 
 
-    override fun checkDownLoad(nameParentSound: String, pathSound: String) {
-        FileHandler.checkFileExists(context, nameParentSound, pathSound, currentPosition).let {
-            isDownload = it
-            if (!it) {
-                view.isDownload(true, R.drawable.download_24px)
+    override fun checkDownLoad(nameParentSound: String, pathSound: String, position: Int) {
+        FileHandler.checkFileExists(context, nameParentSound, pathSound, position) { s, b ->
+            isDownload = b
+
+            if (!b) {
+                view.isDownload(true, R.drawable.download_24px, s, position)
             } else {
-                view.isDownload(false, R.drawable.baseline_cloud_done_24)
+                view.isDownload(false, R.drawable.baseline_cloud_done_24, s, position)
             }
         }
-
     }
 
     override fun downLoad(mImg: DataImage, mSound: DataSound, position: Int) {
@@ -123,19 +128,19 @@ class ShowPresenter(
                                     )
                                     view.downLoadSuccess()
                                 } else {
-                                    view.dowLoadFailed("Kiểm tra mạng")
+                                    view.dowLoadFailed(context.getString(R.string.please_check_network))
                                 }
                             }
                         } else {
-                            view.dowLoadFailed("Kiểm tra mạng")
+                            view.dowLoadFailed(context.getString(R.string.please_check_network))
                         }
                     }
                 } else {
-                    view.dowLoadFailed("Kiểm tra mạng")
+                    view.dowLoadFailed(context.getString(R.string.please_check_network))
                 }
             }
         } catch (e: Exception) {
-            view.dowLoadFailed("Kiểm tra mạng$e")
+            view.dowLoadFailed(context.getString(R.string.please_check_network))
         }
     }
 
@@ -194,38 +199,40 @@ class ShowPresenter(
         }
         mediaPlayer.setOnErrorListener { mp, what, _ ->
             setError(what)
+
             false
         }
     }
 
     private fun setError(what: Int) {
-        when (what) {
-            MediaPlayer.MEDIA_ERROR_UNKNOWN -> {
-                // Xử lý lỗi không xác định
-                view.loadFailed("Unknown error occurred")
-            }
-
-            MediaPlayer.MEDIA_ERROR_IO -> {
-                // Xử lý lỗi đọc/ghi tệp tin hoặc luồng
-                view.loadFailed("IO error occurred")
-
-            }
-
-            MediaPlayer.MEDIA_ERROR_MALFORMED -> {
-                // Xử lý lỗi định dạng không hợp lệ
-                view.loadFailed("Malformed media error occurred")
-            }
-
-            MediaPlayer.MEDIA_ERROR_TIMED_OUT -> {
-                // Xử lý lỗi quá thời gian chờ
-                view.loadFailed("Timeout error occurred")
-            }
-
-            else -> {
-                view.loadFailed("Không có kết nối mạng")
-
-            }
-        }
+//        when (what) {
+//            MediaPlayer.MEDIA_ERROR_UNKNOWN -> {
+//                // Xử lý lỗi không xác định
+//                view.loadFailed("Unknown error occurred")
+//            }
+//
+//            MediaPlayer.MEDIA_ERROR_IO -> {
+//                // Xử lý lỗi đọc/ghi tệp tin hoặc luồng
+//                view.loadFailed("IO error occurred")
+//
+//            }
+//
+//            MediaPlayer.MEDIA_ERROR_MALFORMED -> {
+//                // Xử lý lỗi định dạng không hợp lệ
+//                view.loadFailed("Malformed media error occurred")
+//            }
+//
+//            MediaPlayer.MEDIA_ERROR_TIMED_OUT -> {
+//                // Xử lý lỗi quá thời gian chờ
+//                view.loadFailed("Timeout error occurred")
+//            }
+//
+//            else -> {
+//                view.loadFailed("Không có kết nối mạng")
+//
+//            }
+//        }
+        view.loadFailed(context.getString(R.string.please_check_network))
     }
 
     override fun playMusicOff(raw: AssetFileDescriptor) {
@@ -237,6 +244,9 @@ class ShowPresenter(
     }
 
     override fun playMusic(url: String) {
+        Handler(Looper.myLooper()!!).postDelayed({
+            if (!mediaPlayer.isPlaying) view.loadFailed(context.getString(R.string.please_check_network))
+        }, 2000)
         try {
             val check = context.assets.openFd(url)
             playMusicOff(check)
@@ -264,19 +274,24 @@ class ShowPresenter(
     }
 
     override fun setRepeatInterval(intervalSeconds: Int) {
+        val run = Runnable {
+            mediaPlayer.seekTo(0)
+            mediaPlayer.start()
+        }
+        val handel = Handler(Looper.getMainLooper())
         if (!mediaPlayer.isPlaying) {
-            Handler(Looper.getMainLooper()).postDelayed({
-                mediaPlayer.seekTo(0)
-                mediaPlayer.start()
-            }, intervalSeconds.toLong())
+            handlerInterval(handel, run, intervalSeconds)
         }
         mediaPlayer.setOnCompletionListener {
-            if (isLooping) {
-                Handler(Looper.getMainLooper()).postDelayed({
-                    mediaPlayer.seekTo(0)
-                    mediaPlayer.start()
-                }, intervalSeconds.toLong())
-            }
+            handlerInterval(handel, run, intervalSeconds)
+        }
+    }
+
+    private fun handlerInterval(handel: Handler, run: Runnable, intervalSeconds: Int) {
+        if (intervalSeconds == -1) {
+            handel.removeCallbacks(run)
+        } else {
+            handel.postDelayed(run, intervalSeconds.toLong())
         }
     }
 }

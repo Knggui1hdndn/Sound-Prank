@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.core.content.FileProvider
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints.AUTHORITY
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
@@ -242,17 +243,36 @@ object FileHandler {
         context: Context,
         nameParent: String,
         pathSound: String,
-        position: Int
-    ): Boolean {
+        position: Int,
+        call: (String, Boolean) -> Unit
+    ) {
         var path = pathSound
-        if (path.contains("content")) {
-            path = path.substring(path.lastIndexOf("/files") + 6, path.length).replace("%20", " ")
+        Log.d("sdsadjalksdjasd",path)
+        val check1 = isFileExistsInAssets(path, context)
+
+        if (check1) {
+            call(path, true)
+            return
+        }
+        path =
+            "${context.filesDir}/$nameParent/${nameParent + position}/${nameParent + position}.mp3"
+
+        val check2 = File(path).exists()
+        if (check2) {
+            call(path, true)
+            return
         }
 
-        return File(context.filesDir, path).exists() || isFileExistsInAssets(
-            pathSound,
-            context
-        ) || File("${context.filesDir}/$nameParent/${nameParent + position}/${nameParent + position}.mp3").exists()
+        if (path.startsWith("content")) {
+            path = path.substring(path.lastIndexOf("/files") + 6, path.length).replace("%20", " ")
+        }
+        val check3 = File(context.filesDir, path).exists()
+
+        if (check3) {
+            call(path, true)
+            return
+        }
+        call(pathSound, false)
     }
 
     private fun isFileExistsInAssets(filePath: String?, context: Context): Boolean {

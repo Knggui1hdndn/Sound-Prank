@@ -4,6 +4,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundClick
 
 
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -52,5 +53,6 @@ class ShowChildSoundAdapter(
 
     override fun onBindViewHolder(holder: ChildSoundViewHolder, position: Int) {
         holder.bind(list[position], position)
+        Log.d("plpplplplpl",list[position] .toString())
     }
 }

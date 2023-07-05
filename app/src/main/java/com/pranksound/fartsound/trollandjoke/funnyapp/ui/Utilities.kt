@@ -16,8 +16,12 @@ import java.util.Random
 
 object Utilities {
     fun getRandomColor(): Int {
-        val rnd = Random()
-        return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+         val colorList = listOf(
+            "FFE6B5", "71C7FF", "9DA0FF", "61E1C3", "FE80A5",
+            "FF8E67", "AAF2E1", "B6E3FF", "D478F7", "FEBFD2"
+        )
+
+        return Color.parseColor("#"+colorList.shuffled()[0])
     }
     fun loadImg(url: String, img: ImageView) {
 

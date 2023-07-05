@@ -15,69 +15,84 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:title=" "
-        app:titleTextColor="@color/color_title_app" >
+        app:titleTextColor="@color/color_title_app">
+
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/kodchasan"
             android:text="@string/app_name"
             android:textColor="@color/color_title_app"
-             android:textSize="28sp"
-            android:fontFamily="@font/kodchasan"
-            >
+            android:textSize="28sp">
 
         </androidx.appcompat.widget.AppCompatTextView>
     </androidx.appcompat.widget.Toolbar>
 
-    <ProgressBar
-        android:id="@+id/mProgress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/txtOff"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Không có kết nối Internet \n Chuyển sang chế độ off"
-        android:textColor="#FB8C00"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/btnLoad"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mToolBar" />
-
-    <Button
-        android:id="@+id/btnLoad"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Load"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/nestedScrollView"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtOff" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoad">
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mToolBar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+<View
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
+    android:background="#C8C8C8"/>
+            <ProgressBar
+                android:id="@+id/mProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/txtOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+
+                android:gravity="center"
+                android:text="@string/no_internet_off"
+                android:textColor="#FF0057"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/btnLoad"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mToolBar" />
+
+            <Button
+                android:id="@+id/btnLoad"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/background"
+                android:drawableStart="@drawable/baseline_refresh_24"
+                android:padding="5dp"
+                android:text="Refresh"
+                android:textAllCaps="false"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/nestedScrollView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtOff" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txt1"
                 style="@style/txt_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
                 android:text="@string/today_tot_sound"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -106,7 +121,8 @@
                 style="@style/txt_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/play_offline"
+                android:fontFamily="sans-serif"
+                android:text="Meme"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/mRcyHot" />
 
@@ -131,7 +147,8 @@
                 style="@style/txt_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/online_sound"
+                android:fontFamily="sans-serif"
+                android:text="Fun sound"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/mRcyOff" />
 
@@ -139,11 +156,7 @@
                 android:id="@+id/mRcy"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="100dp"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txt3" />
+                android:orientation="vertical" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
