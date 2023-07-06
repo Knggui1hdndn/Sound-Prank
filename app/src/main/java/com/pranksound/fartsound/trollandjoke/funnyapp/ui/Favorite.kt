@@ -3,6 +3,7 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,11 +49,11 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
         listOff = favoriteOffList.map { it.second }
 
         if (ListensChangeNetwork.isConnectNetwork == Constraints.CONNECTION_NETWORK) {
-            listNameSound.addAll(favoriteOnlList.map { it.first.name } + favoriteOffList.map { it.first.name })
-            listPosition.addAll(favoriteOnlList.map { it.third } + favoriteOffList.map { it.third })
+            listNameSound.addAll(favoriteOffList.map { it.first.name } + favoriteOnlList.map { it.first.name })
+            listPosition.addAll(favoriteOffList.map { it.third } + favoriteOnlList.map { it.third })
 
         } else {
-            listNameSound.addAll(favoriteOffList.map { it.first.name } )
+            listNameSound.addAll(favoriteOffList.map { it.first.name })
             listPosition.addAll(favoriteOffList.map { it.third })
         }
 
@@ -81,8 +82,8 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
         checkNetwork = true
         ListensChangeNetwork.isConnectNetwork = Constraints.CONNECTION_NETWORK
         favorite.mProgress.visibility = View.GONE
-        listSound.addAll(listOnl)
         listSound.addAll(listOff)
+        listSound.addAll(listOnl)
         setAdapter()
     }
 
@@ -115,6 +116,7 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
     }
 
     override fun itemClick(position: Int) {
+        Log.d("dsssssssssssssss", position.toString())
         val intent = Intent(this, Show::class.java)
         intent.putExtra(Constraints.ACTIVITY_LAUNCH, "Favorite")
         intent.putExtra("sound", listSound[position].source)

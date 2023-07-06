@@ -25,7 +25,9 @@ class SoundChildFavoriteAdapter(
     inner class ChildSoundViewHolder(val binding: ItemSoundChildBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(dataSound: DataSound, position: Int) {
+        try {
             binding.txtName.text= listImgData[position]
+        }catch (e:Exception){}
             binding.cardView.backgroundTintList= ColorStateList.valueOf(Utilities.getRandomColor())
             Utilities.setImage(dataSound.image, binding.img, binding.root.context)
             binding.img.setOnClickListener {

@@ -55,7 +55,6 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
 
     override fun onFailed(e: String) {
         ListensChangeNetwork.isConnectNetwork = Constraints.DISCONNECT_NETWORK
-
         binding.mProgress.visibility = View.GONE
         Utilities.showSnackBar(binding.root, getString(R.string.please_check_network))
         if (listHash.size == 0) {
@@ -134,9 +133,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
     }
 
 
-    override fun itemClick(triple: Triple<DataImage, Boolean, List<DataSound>>, position: Int) {
-
-
+    override fun itemClick(triple: Triple<DataImage, Boolean, List<DataSound>>, position: Int) {0
         try {
             listHash[position] = triple
             adapter.setData(listHash)
