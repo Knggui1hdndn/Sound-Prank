@@ -247,6 +247,12 @@ object FileHandler {
         call: (String, Boolean) -> Unit
     ) {
         var path = pathSound
+
+        val check2 = File(path).exists()
+        if (check2) {
+            call(path, true)
+            return
+        }
         Log.d("sdsadjalksdjasd",path)
         val check1 = isFileExistsInAssets(path, context)
 
@@ -254,19 +260,15 @@ object FileHandler {
             call(path, true)
             return
         }
-        path =
-            "${context.filesDir}/$nameParent/${nameParent + position}/${nameParent + position}.mp3"
 
-        val check2 = File(path).exists()
-        if (check2) {
+        if (path.startsWith("content")) {
             call(path, true)
             return
         }
+        path = "${context.filesDir}/$nameParent/${nameParent + position}/${nameParent + position}.mp3"
+        Log.d("sdsadjalksdjasdd",path)
 
-        if (path.startsWith("content")) {
-            path = path.substring(path.lastIndexOf("/files") + 6, path.length).replace("%20", " ")
-        }
-        val check3 = File(context.filesDir, path).exists()
+        val check3 = File(  path).exists()
 
         if (check3) {
             call(path, true)

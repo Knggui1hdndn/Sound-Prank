@@ -32,6 +32,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresent
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ShowPresenter
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundClickListens
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.SoundParentAdapter
+import java.io.File
 
 
 class Show : AppCompatActivity(), ApiClientContract.Listens,
@@ -85,7 +86,8 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
             img.setOnClickListener {
                 showPresenter.playMusic(source)
             }
-            imgBack.setOnClickListener { finish() }
+            imgBack.setOnClickListener { finish()
+                showPresenter.setRepeatInterval(-1)}
             imgFavorite.setOnClickListener {
                 startActivity(Intent(this@Show, Favorite::class.java))
             }
@@ -119,7 +121,6 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
                     position: Int, positionOffset: Float, positionOffsetPixels: Int
                 ) {
                     handlePageScrolled(position)
-
                 }
             })
         }
@@ -129,6 +130,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
         currentPosition = position
         with(showPresenter) {
             showPresenter.pauseMusic()
+            showPresenter.setRepeatInterval(-1)
             binding.cbLoop.isChecked = false
             if (list.size > 0) {
                 itemDataSound = list[position]
@@ -136,20 +138,18 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
                 if (isCallingActivity) {
                     mDataImage = getDataImgFavorite(source)
                     val c = listName[position].trim().split("")
-                     val int=c[c.size - 2].toInt()
+                    val int = c[c.size - 2].toInt()
                     checkDownLoad(mDataImage.name.trim(), source, int)
                 } else {
                     checkDownLoad(mDataImage.name, source, position)
                 }
                 isFavorite(source)
-
                 setImage()
             }
         }
     }
 
     private fun setUpActivity() {
-        listName = intent.getStringArrayListExtra("listName")!!
         check = ListensChangeNetwork.isConnectNetwork
         layoutRefresh = binding.refresh
         binding.mConstraint.isEnabled = false
@@ -159,6 +159,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
         val callingActivity = intent.getStringExtra(Constraints.ACTIVITY_LAUNCH).toString()
         isCallingActivity = callingActivity == "Favorite"
         if (isCallingActivity) {
+            listName = intent.getStringArrayListExtra("listName")!!
             binding.mProgress1.visibility = View.GONE
             setUpFavoriteActivity(intent)
         } else {
@@ -178,6 +179,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
             )
             setResult(Activity.RESULT_OK, resultIntent)
         }
+        showPresenter.setRepeatInterval(-1)
         finish()
     }
 
@@ -242,8 +244,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
 
     @SuppressLint("ResourceType", "UseCompatLoadingForDrawables")
     override fun downLoadSuccess() {
-        val dataSoundChildList =
-            FileHandler.getDataSoundChildFromInternalStorage(this@Show, mDataImage.name)
+        val dataSoundChildList =FileHandler.getDataSoundChildFromInternalStorage(this@Show, mDataImage.name)
         val dataSoundChild = dataSoundChildList[0].third.size
         if (showPresenter.isFavorite(source)) {
             FileHandler.removeFavoriteOnl(this, itemDataSound)

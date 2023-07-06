@@ -7,6 +7,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.core.net.toUri
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
@@ -15,6 +16,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.broadcast.ListensChangeNet
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ShowContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
+import java.io.File
 
 
 class ShowPresenter(
@@ -95,6 +97,7 @@ class ShowPresenter(
     override fun checkDownLoad(nameParentSound: String, pathSound: String, position: Int) {
         FileHandler.checkFileExists(context, nameParentSound, pathSound, position) { s, b ->
             isDownload = b
+            Log.d("sodggdggdsdfgg", isDownload.toString())
 
             if (!b) {
                 view.isDownload(true, R.drawable.download_24px, s, position)
@@ -155,6 +158,7 @@ class ShowPresenter(
 
     override fun clickItemMenuPopup(position: Int) {
         val list = context.resources.getStringArray(R.array.time)
+        if (position==-1){ setRepeatInterval(-1);return}
         val item = list[position]
         val repeatInterval = when {
             item.contains("s") -> item.split("s")[0].toInt() * 1000

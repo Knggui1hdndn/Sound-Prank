@@ -19,8 +19,7 @@ class ShowChildSoundAdapter(
     private val  listName: ArrayList<String>?,
     private val childSoundClickListens: ChildSoundClickListens,
     private val titleSoundParent: String
-) :
-    RecyclerView.Adapter<ShowChildSoundAdapter.ChildSoundViewHolder>() {
+) : RecyclerView.Adapter<ShowChildSoundAdapter.ChildSoundViewHolder>() {
     fun setData(list: List<DataSound>){
         this.list=list
         notifyDataSetChanged()
@@ -28,7 +27,7 @@ class ShowChildSoundAdapter(
     inner class ChildSoundViewHolder(val binding: ItemHotSound1Binding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(dataSound: DataSound, position: Int) {
-            binding.txtName.text= if (listName!=null  ) listName[position] else "$titleSoundParent $position"
+            binding.txtName.text= if (listName!=null &&listName.size>0 ) listName[position] else "$titleSoundParent $position"
             binding.cardView.backgroundTintList= ColorStateList.valueOf(Utilities.getRandomColor())
             Utilities.setImage(dataSound.image, binding.img, binding.root.context)
             binding.img.setOnClickListener {

@@ -11,7 +11,7 @@ import androidx.core.net.toUri
 import com.google.android.material.snackbar.Snackbar
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.squareup.picasso.Picasso
-import java.util.Random
+import kotlin.random.Random
 
 
 object Utilities {
@@ -21,7 +21,7 @@ object Utilities {
             "FF8E67", "AAF2E1", "B6E3FF", "D478F7", "FEBFD2"
         )
 
-        return Color.parseColor("#"+colorList.shuffled()[0])
+        return Color.parseColor("#"+colorList.shuffled()[Random.nextInt(0,8)])
     }
     fun loadImg(url: String, img: ImageView) {
 
