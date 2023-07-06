@@ -86,11 +86,13 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
             img.setOnClickListener {
                 showPresenter.playMusic(source)
             }
-            imgBack.setOnClickListener { finish()
-                showPresenter.setRepeatInterval(-1)}
+            imgBack.setOnClickListener {
+                finish()
+                showPresenter.setRepeatInterval(-1)
+            }
             imgFavorite.setOnClickListener {
                 startActivity(Intent(this@Show, Favorite::class.java))
-            }
+             }
             layoutRefresh.button.setOnClickListener { recreate() }
             imgDowload.setOnClickListener {
                 var position = currentPosition
@@ -149,6 +151,10 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+      if (list.size>0){  handlePageScrolled(currentPosition)}
+    }
     private fun setUpActivity() {
         check = ListensChangeNetwork.isConnectNetwork
         layoutRefresh = binding.refresh
@@ -169,8 +175,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
     }
 
     override fun onBackPressed() {
-        if (isCallingActivity) {
-            val resultIntent = Intent()
+             val resultIntent = Intent()
             val arrayList = arrayListOf<Int>()
             arrayList.addAll(listPositionUnchecked)
             resultIntent.putIntegerArrayListExtra(
@@ -178,7 +183,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
                 arrayList
             )
             setResult(Activity.RESULT_OK, resultIntent)
-        }
+
         showPresenter.setRepeatInterval(-1)
         finish()
     }
@@ -244,7 +249,8 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
 
     @SuppressLint("ResourceType", "UseCompatLoadingForDrawables")
     override fun downLoadSuccess() {
-        val dataSoundChildList =FileHandler.getDataSoundChildFromInternalStorage(this@Show, mDataImage.name)
+        val dataSoundChildList =
+            FileHandler.getDataSoundChildFromInternalStorage(this@Show, mDataImage.name)
         val dataSoundChild = dataSoundChildList[0].third.size
         if (showPresenter.isFavorite(source)) {
             FileHandler.removeFavoriteOnl(this, itemDataSound)
@@ -255,7 +261,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
             )
         }
         source = dataSoundChildList[0].third[dataSoundChild - 1].source
-        binding.imgDowload.setBackgroundResource(R.drawable.baseline_cloud_done_24)
+        binding.imgDowload.setBackgroundResource(R.drawable.download_success)
         binding.imgDowload.isEnabled = false
         binding.mProgress1.visibility = View.INVISIBLE
     }

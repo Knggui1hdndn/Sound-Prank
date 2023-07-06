@@ -12,8 +12,9 @@ class Splash : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Handler(Looper.myLooper()!!).postDelayed(Runnable {
+        Handler(Looper.myLooper()!!).postDelayed({
             startActivity(Intent(this@Splash, Home::class.java))
+            finish()
         }, 3000)
     }
 }

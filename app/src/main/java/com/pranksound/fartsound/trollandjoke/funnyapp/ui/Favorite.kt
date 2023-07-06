@@ -37,25 +37,29 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
         listSound = mutableListOf()
         setAdapter()
         val apiClient = ApiClientPresenter()
-        favorite.imgBack.setOnClickListener{
+        favorite.imgBack.setOnClickListener {
             finish()
         }
-
-
 
         val favoriteOnlList = FileHandler.getFavoriteOnl(this@Favorite)
         val favoriteOffList = FileHandler.getFavoriteOff(this@Favorite)
 
         listOnl = favoriteOnlList.map { it.second }
         listOff = favoriteOffList.map { it.second }
-        listNameSound.addAll(favoriteOnlList.map { it.first.name } + favoriteOffList.map { it.first.name })
-        listPosition.addAll(favoriteOnlList.map { it.third } + favoriteOffList.map { it.third })
 
+        if (ListensChangeNetwork.isConnectNetwork == Constraints.CONNECTION_NETWORK) {
+            listNameSound.addAll(favoriteOnlList.map { it.first.name } + favoriteOffList.map { it.first.name })
+            listPosition.addAll(favoriteOnlList.map { it.third } + favoriteOffList.map { it.third })
+
+        } else {
+            listNameSound.addAll(favoriteOffList.map { it.first.name } )
+            listPosition.addAll(favoriteOffList.map { it.third })
+        }
 
         for (i in 0 until minOf(listNameSound.size, listPosition.size)) {
             val elementA = listPosition[i].toString()
             val elementB = listNameSound[i]
-            val combinedElement = elementB + " " + elementA
+            val combinedElement = "$elementB $elementA"
             combinedList.add(combinedElement)
         }
         apiClient.getListParentSound(object : ApiClientContract.Listens {
@@ -67,8 +71,6 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
                 handleFailure(listOff)
             }
         })
-
-
     }
 
     private fun handleSuccess(

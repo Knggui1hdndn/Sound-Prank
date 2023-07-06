@@ -37,7 +37,7 @@ class ShowPresenter(
         mDataImage: DataImage,
         position: Int
     ) {
-        with(FileHandler) {
+         with(FileHandler) {
             if (isDownload) {
                 if (isChecked)
                     saveFavoriteOff(dataSound, mDataImage, context, position)
@@ -102,7 +102,7 @@ class ShowPresenter(
             if (!b) {
                 view.isDownload(true, R.drawable.download_24px, s, position)
             } else {
-                view.isDownload(false, R.drawable.baseline_cloud_done_24, s, position)
+                view.isDownload(false, R.drawable.download_success, s, position)
             }
         }
     }
