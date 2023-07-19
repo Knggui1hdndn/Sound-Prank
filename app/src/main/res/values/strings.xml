@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Prank Sound</string>
     <string name="text_splash">Let our  amusing s
 bring smile to your face.
@@ -31,5 +31,33 @@ Currently in off mode.</string>
         <item>3m</item>
         <item>5m</item>
     </string-array>
-
+    <string name="title_sup">Meme Sound For Pranking</string>
+    <string name="mess_sup">Turning Daily Moments into Hilarious Symphony of Laughter</string>
+    <string name="title_sup_2">What Prank Sound Premium brings you</string>
+    <string name="title_buy_1">Get Your\n3-Day Free</string>
+    <string name="title_buy_2">3-Day
+Free Trial</string>
+    <string name="title_buy_3">Lifetime</string>
+    <string name="mess_buy">Then</string>
+    <string name="mess_buy_3">Never miss out on new updates</string>
+    <string name="billing_end">You can cancel at anytime on Google Play.</string>
+    <string name="billing_starts">Billing starts at the end of the 3-day free trail </string>
+    <string name="start_free_trial">Start free trial</string>
+    <string name="privacy_policys"  ><u>Privacy Policy</u></string>
+    <string name="limited_version">Limited Version</string>
+    <string name="premiums">Premium</string>
+    <string name="remove_ads">Remove Ads</string>
+    <string name="unlock_all_sounds">Unlock All Sounds</string>
+    <string name="download_hot_sound">Download Hot Sound</string>
+    <string name="play_meme_sound">Play Meme\n Sound</string>
+    <string name="all">All</string>
+    <string name="_5_sounds">5 Sounds</string>
+    <string name="prank_with_funny_sounds">Prank With\nFunny Sounds</string>
+    <string name="play_fart_sound_amp_air_horn"><![CDATA[Play Fart Sound\n& Air Horn]]></string>
+    <string name="download_sound_amp_use_offline"><![CDATA[Download Sound & Use Offline]]></string>
+    <string name="compilation_of_hot_sounds">Compilation of Hot Sounds</string>
+    <string name="add_sound_to_favorite_list">Add Sound To Favorite List</string>
+    <string name="loop_mode_for_replaying">Loop Mode For Replaying</string>
+    <string name="set_timer_to_have_free_hands">Set Timer To Have Free Hands</string>
+    <string name="haircut_prank_moments">Haircut Prank Moments</string>
 </resources>

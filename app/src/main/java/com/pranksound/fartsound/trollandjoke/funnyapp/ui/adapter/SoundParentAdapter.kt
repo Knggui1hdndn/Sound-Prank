@@ -3,6 +3,7 @@ package com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +18,10 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ItemSoundParen
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Home
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
+import java.util.Locale
 import kotlin.properties.Delegates
 
 interface RecyclerView {
@@ -112,7 +115,10 @@ class SoundParentAdapter(
 
                 override fun onFailed(e: String) {
                     binding.mProgress.visibility = View.GONE
-                    Utilities.showSnackBar(binding.root,context.getString(R.string.please_check_network))
+                    Utilities.showSnackBar(
+                        binding.root,
+                        context.getString(R.string.please_check_network)
+                    )
                     isChecked = !isChecked
                 }
             })
@@ -131,6 +137,19 @@ class SoundParentAdapter(
 
         override fun itemClick(position: Int) {
             val context = binding.root.context
+            val home = context as Home
+            if (Utilities.hasMemeOrHot(mDataImage.name) || Utilities.countClickSound == 4 || Utilities.countClickSound == 0) {
+                home.showInterstitial(true) {
+                    startActivity(position)
+                }
+            } else {
+                startActivity(position)
+            }
+            Utilities.countClickSound++
+            if (Utilities.countClickSound==4)  Utilities.countClickSound = 0
+        }
+
+        private fun startActivity(position: Int) {
             val intent = Intent(context, Show::class.java)
             intent.putExtra(Constraints.SOUND_CHILD_CLICK, position)
             intent.putExtra(Constraints.PARENT_SOUND, mDataImage)

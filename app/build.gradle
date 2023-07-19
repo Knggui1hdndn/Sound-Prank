@@ -1,7 +1,14 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+      id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
+
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+
 
 android {
     namespace 'com.pranksound.fartsound.trollandjoke.funnyapp'
@@ -15,6 +22,13 @@ android {
         versionName "1.0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+
+        buildConfigField("String", "GG_APP_OPEN", apikeyProperties['GG_APP_OPEN'])
+        buildConfigField("String", "GG_BANNER", apikeyProperties['GG_BANNER'])
+        buildConfigField("String", "GG_NATIVE", apikeyProperties['GG_NATIVE'])
+        buildConfigField("String", "GG_FULL", apikeyProperties['GG_FULL'])
+        buildConfigField("String", "GG_REWARDED", apikeyProperties['GG_REWARDED'])
     }
 
     buildTypes {
@@ -23,23 +37,33 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
     buildFeatures {
         viewBinding = true
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    dataBinding {
+        enabled true
     }
-    kotlinOptions {
-        jvmTarget = '1.8'
+    lintOptions {
+        abortOnError false
+        absolutePaths false
     }
-
 }
 
 dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.okhttp3:okhttp:3.14.9'
-
+    implementation 'me.relex:circleindicator:2.1.6'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     // Converter Gson
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'

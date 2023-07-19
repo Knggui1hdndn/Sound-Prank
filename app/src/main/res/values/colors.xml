@@ -4,4 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="title_sound_parent">#3571AE</color>
     <color name="color_title_app">#F8A130</color>
+    <color name="line">#366294</color>
+    <color name="title_sub">#0D1C65</color>
+    <color name="clickSub">#FF8D07</color>
 </resources>

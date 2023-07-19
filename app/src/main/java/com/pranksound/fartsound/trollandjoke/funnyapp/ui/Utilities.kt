@@ -11,10 +11,12 @@ import androidx.core.net.toUri
 import com.google.android.material.snackbar.Snackbar
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.squareup.picasso.Picasso
+import java.util.Locale
 import kotlin.random.Random
 
 
 object Utilities {
+    var countClickSound=0
     fun getRandomColor(): Int {
          val colorList = listOf(
             "FFE6B5", "71C7FF", "9DA0FF", "61E1C3", "FE80A5",
@@ -57,6 +59,21 @@ object Utilities {
     fun showSnackBar(v:View,s:String){
        Snackbar.make(v,s,Snackbar.LENGTH_SHORT).show()
     }
+
+    fun hasMemeOrHot(name:String):Boolean{
+        val listTop = listOf(
+            "airhorn",
+            "car",
+            "door bell",
+            "hair clipper",
+            "fart sound",
+            "siren head",
+            "gun"
+        )
+        return listTop.contains( name.lowercase(Locale.ROOT))|| name.lowercase(
+            Locale.ROOT).contains("meme")
+    }
+
 
 
 }

@@ -1,8 +1,8 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter
 
- import android.content.Intent
+import android.content.Intent
 import android.graphics.Bitmap
-  import android.view.LayoutInflater
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -11,12 +11,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
- import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Home
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
 
 
-
-class MemeSoundAdapter(   private val list: List<DataImage> ) :
+class MemeSoundAdapter(private val list: List<DataImage>) :
     RecyclerView.Adapter<MemeSoundAdapter.MemeAdapterListensViewHolder>() {
 
     inner class MemeAdapterListensViewHolder(private val view: View) :
@@ -28,10 +28,11 @@ class MemeSoundAdapter(   private val list: List<DataImage> ) :
             Utilities.setImage(mDataImage.icon, img, view.context)
             img.setOnClickListener {
                 val context = it.context
-                val intent = Intent(context, Show::class.java)
-                intent.putExtra(Constraints.PARENT_SOUND, mDataImage)
-
-                context.startActivity(intent)
+                (context as Home).showInterstitial(true) {
+                    val intent = Intent(context, Show::class.java)
+                    intent.putExtra(Constraints.PARENT_SOUND, mDataImage)
+                    context.startActivity(intent)
+                }
             }
         }
     }
@@ -40,7 +41,8 @@ class MemeSoundAdapter(   private val list: List<DataImage> ) :
         parent: ViewGroup,
         viewType: Int
     ): MemeAdapterListensViewHolder {
-        return MemeAdapterListensViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_meme_sound, parent, false)
+        return MemeAdapterListensViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_meme_sound, parent, false)
         )
 
     }

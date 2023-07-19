@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
+import com.pranksound.fartsound.trollandjoke.funnyapp.application.BaseActivity
 import com.pranksound.fartsound.trollandjoke.funnyapp.broadcast.ListenNetwork
 import com.pranksound.fartsound.trollandjoke.funnyapp.broadcast.ListensChangeNetwork
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
@@ -32,7 +33,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.SoundParentAdapter
 
 
-class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, ListenNetwork {
+class Home : BaseActivity(), ApiClientContract.Listens, RecyclerView, ListenNetwork {
     override fun onSuccess(list: List<Any>) {
         binding.mProgress.visibility = View.GONE
         //ITEM-CHECK-LIST CHILD
@@ -80,6 +81,9 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        getConfigData(false)
+
+        showBannerAds(binding.bannerAds)
         //val typeFace = Typeface.create(resources.getFont(R.font.kodchasan), Typeface.BOLD)
         //        val toolbarTitle = SpannableString(binding.mToolBar.title)
         //        val toolbarTypefaceSpan = TypefaceSpan(typeFace)
@@ -105,9 +109,7 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
             listHash.clear()
             recreate()
         }
-
     }
-
 
     private fun setAdapter() {
         SoundParentAdapter.SIZE = listHash.size
@@ -181,7 +183,6 @@ class Home : AppCompatActivity(), ApiClientContract.Listens, RecyclerView, Liste
             binding.txtOff.text = getString(R.string.no_internet_off)
             binding.txtOff.isEnabled = true
         }
-
         binding.txtOff.visibility = View.VISIBLE
         binding.btnLoad.visibility = View.VISIBLE
     }

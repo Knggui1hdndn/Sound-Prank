@@ -22,6 +22,7 @@ class SoundChildAdapter(
         this.list=list
         notifyDataSetChanged()
     }
+
     inner class ChildSoundViewHolder(val binding: ItemSoundChildBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(dataSound: DataSound, position: Int) {

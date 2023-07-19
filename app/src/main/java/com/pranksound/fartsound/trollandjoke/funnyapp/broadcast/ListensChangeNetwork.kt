@@ -19,8 +19,7 @@ class ListensChangeNetwork(val listensChangeNetwork: ListenNetwork) : BroadcastR
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d("okokokoko","okoooooo")
-        val connectivityManager =
+         val connectivityManager =
             context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val capabilities = connectivityManager.getNetworkCapabilities(network)

@@ -1,8 +1,9 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter
 
- import android.content.Intent
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
-  import android.view.LayoutInflater
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -11,10 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
- import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Home
+import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Show
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.Utilities
-
-
+import java.util.Locale
 
 
 class HotSoundAdapter(
@@ -33,18 +34,37 @@ class HotSoundAdapter(
             Utilities.setImage(mDataImage.icon, img, view.context)
             mView.setOnClickListener {
                 val context = it.context
-                val intent = Intent(context, Show::class.java)
-                intent.putExtra(Constraints.PARENT_SOUND, mDataImage)
-                 context.startActivity(intent)
+                check(context, mDataImage)
             }
         }
+
+        private fun startActivity(context: Context, mDataImage: DataImage) {
+            val intent = Intent(context, Show::class.java)
+            intent.putExtra(Constraints.PARENT_SOUND, mDataImage)
+            context.startActivity(intent)
+        }
+
+        private fun check(context: Context, mDataImage: DataImage) {
+            val home = context as Home
+            if (Utilities.hasMemeOrHot(mDataImage.name) || Utilities.countClickSound == 4 || Utilities.countClickSound == 0) {
+                home.showInterstitial(true) {
+                    startActivity(context, mDataImage)
+                }
+            } else {
+                startActivity(context, mDataImage)
+            }
+            Utilities.countClickSound++
+            if (Utilities.countClickSound == 4) Utilities.countClickSound = 0
+        }
     }
+
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): HotAdapterListensViewHolder {
-        return HotAdapterListensViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_hot_sound, parent, false)
+        return HotAdapterListensViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_hot_sound, parent, false)
         )
 
     }

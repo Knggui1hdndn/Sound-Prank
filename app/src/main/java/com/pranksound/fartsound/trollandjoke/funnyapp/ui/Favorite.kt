@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
+import com.pranksound.fartsound.trollandjoke.funnyapp.application.BaseActivity
 import com.pranksound.fartsound.trollandjoke.funnyapp.broadcast.ListensChangeNetwork
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ActivityFavoriteBinding
@@ -20,7 +21,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.ChildSoundClick
 import com.pranksound.fartsound.trollandjoke.funnyapp.ui.adapter.SoundChildFavoriteAdapter
 
 
-class Favorite : AppCompatActivity(), ChildSoundClickListens {
+class Favorite : BaseActivity(), ChildSoundClickListens {
     private lateinit var favorite: ActivityFavoriteBinding
     private lateinit var adapterFavorite: SoundChildFavoriteAdapter
     private lateinit var listSound: MutableList<DataSound>
@@ -41,6 +42,8 @@ class Favorite : AppCompatActivity(), ChildSoundClickListens {
         favorite.imgBack.setOnClickListener {
             finish()
         }
+        showBannerAds(favorite.bannerAds)
+        showBannerAds(favorite.bannerAds2)
 
         val favoriteOnlList = FileHandler.getFavoriteOnl(this@Favorite)
         val favoriteOffList = FileHandler.getFavoriteOff(this@Favorite)
