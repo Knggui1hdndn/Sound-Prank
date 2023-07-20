@@ -43,7 +43,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
     }
 
     private var list: MutableList<DataSound> = mutableListOf()
-      lateinit var binding: ActivityShowBinding
+    lateinit var binding: ActivityShowBinding
     private var currentPosition = 0
     private lateinit var mDataImage: DataImage
     private lateinit var layoutRefresh: RefreshBinding
@@ -58,43 +58,51 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
         with(binding) {
             txtTitleSoundChild.text = mDataImage.name
             mProgress1.visibility = View.VISIBLE
-          with(showPresenter) {
-              seekBar.max =  getMaxVolume()
+            with(showPresenter) {
+                seekBar.max = getMaxVolume()
 
-              seekBar.progress =  getCurrentVolume()
+                seekBar.progress = getCurrentVolume()
 
-              seekBar.setOnSeekBarChangeListener(this@Show)
+                seekBar.setOnSeekBarChangeListener(this@Show)
 
-              imgNext.setOnClickListener { nextItem() }
+                imgNext.setOnClickListener { nextItem() }
 
-              cbLoop.setOnClickListener { setLooping(cbLoop.isChecked) }
+                cbLoop.setOnClickListener { setLooping(cbLoop.isChecked) }
 
-              btnTime.setOnClickListener { clickMenuPopup() }
+                btnTime.setOnClickListener { clickMenuPopup() }
 
-              imgPre.setOnClickListener { prevItem() }
+                imgPre.setOnClickListener { prevItem() }
 
-              img.setOnClickListener { playMusic() }
+                img.setOnClickListener { playMusic() }
 
-              imgBack.setOnClickListener { finish(); setRepeatInterval(-1) }
+                imgBack.setOnClickListener { finish(); setRepeatInterval(-1) }
 
-              imgFavorite.setOnClickListener { startActivity(Intent(this@Show, Favorite::class.java)) }
+                imgFavorite.setOnClickListener {
+                    startActivity(
+                        Intent(
+                            this@Show,
+                            Favorite::class.java
+                        )
+                    )
+                }
 
-              layoutRefresh.button.setOnClickListener { recreate() }
+                layoutRefresh.button.setOnClickListener { recreate() }
 
-              imgDowload.setOnClickListener { handlerDownloadClick() }
+                imgDowload.setOnClickListener { handlerDownloadClick() }
 
-              cbFavourite.setOnClickListener { handlerCbFavouriteClick(cbFavourite.isChecked) }
+                cbFavourite.setOnClickListener { handlerCbFavouriteClick(cbFavourite.isChecked) }
 
-              registerForContextMenu(btnTime)
+                registerForContextMenu(btnTime)
 
-              mRcy.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                  override fun onPageScrolled(
-                      position: Int, positionOffset: Float, positionOffsetPixels: Int
-                  ) {
-                       handlePageScrolled(position)
-                  }
-              })
-          }
+                mRcy.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                    override fun onPageScrolled(
+                        position: Int, positionOffset: Float, positionOffsetPixels: Int
+                    ) {
+                        handlePageScrolled(position)
+                        binding.txtTime.text=""
+                    }
+                })
+            }
         }
     }
 
@@ -124,7 +132,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
 //        )
 //        setResult(Activity.RESULT_OK, resultIntent)
 //
-       showPresenter.setRepeatInterval(-1)
+        showPresenter.setRepeatInterval(-1)
         finish()
     }
 
@@ -136,6 +144,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
             menu!!.add(0, 0, 0, it)
         }
         popupMenu.setOnMenuItemClickListener {
+            binding.txtTime.text=it.title
             showPresenter.clickItemMenuPopup(list.indexOf(it.title))
             true
         }
@@ -150,11 +159,12 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
 
 
     override fun setAdapter(list: MutableList<DataSound>) {
-         val adapter = ShowChildSoundAdapter(list, showPresenter.listName, object : ChildSoundClickListens {
-            override fun itemClick(position: Int) {
+        val adapter =
+            ShowChildSoundAdapter(list, showPresenter.listName, object : ChildSoundClickListens {
+                override fun itemClick(position: Int) {
 
-            }
-        }, mDataImage.name)
+                }
+            }, mDataImage.name)
         binding.mRcy.apply {
             val comPosit = CompositePageTransformer()
             comPosit.addTransformer(MarginPageTransformer(30))
@@ -166,7 +176,6 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
             binding.mRcy.setCurrentItem(currentPosition, true)
         }
 
-
     }
 
     override fun onDataImage(mDataImage: DataImage) {
@@ -175,7 +184,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
 
     override fun onPagerScroll() {
         binding.cbLoop.isChecked = false
-        binding.mProgress1.visibility=View.INVISIBLE
+        binding.mProgress1.visibility = View.INVISIBLE
 
     }
 
@@ -208,6 +217,7 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
         super.onDestroy()
         showPresenter.pauseMusic()
     }
+
     override fun loadSuccess() {
         binding.mProgress.visibility = View.INVISIBLE
 
@@ -223,11 +233,11 @@ class Show : AppCompatActivity(), ApiClientContract.Listens,
     }
 
     override fun showCurrentItem(int: Int) {
+        currentPosition = int
         binding.mRcy.setCurrentItem(int, false)
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
-    override fun dowLoadFailed(e: String) {
+     override fun dowLoadFailed(e: String) {
         binding.imgDowload.setBackgroundResource(R.drawable.download_24px)
         binding.imgDowload.isEnabled = true
         binding.mProgress1.visibility = View.INVISIBLE

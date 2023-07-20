@@ -96,21 +96,23 @@ object FileHandler {
         var listDataSound = mutableListOf<DataSound>()
         var imgParentSound = ""
         for (fileNameParent in parentDirectories) {//Lấy các thư mục lớn nhất sau dirZ
-            val directory = File(context.filesDir, fileNameParent)
-            val fileChilds = directory.listFiles()
-            fileChilds?.forEach { fileChild ->//Lấy các  thư mục con của  lớn nhất
-                if (fileChild.isFile && fileChild.name == "img.png") {
-                    imgParentSound = getFileUri(context, fileChild)
-                }
-                val directoryChild = File(directory, fileChild.name)
-                val fileImgSounds = directoryChild.listFiles()
-                val dataSound = processFileImgSound(context, fileImgSounds)
-                if (dataSound != null) {
-                    listDataSound.add(dataSound)
-                }
-            }
-            list.add(Triple(DataImage("0", fileNameParent, imgParentSound), false, listDataSound))
-            listDataSound = mutableListOf()
+           if (fileNameParent.length<=30){
+               val directory = File(context.filesDir, fileNameParent)
+               val fileChilds = directory.listFiles()
+               fileChilds?.forEach { fileChild ->//Lấy các  thư mục con của  lớn nhất
+                   if (fileChild.isFile && fileChild.name == "img.png") {
+                       imgParentSound = getFileUri(context, fileChild)
+                   }
+                   val directoryChild = File(directory, fileChild.name)
+                   val fileImgSounds = directoryChild.listFiles()
+                   val dataSound = processFileImgSound(context, fileImgSounds)
+                   if (dataSound != null) {
+                       listDataSound.add(dataSound)
+                   }
+               }
+               list.add(Triple(DataImage("0", fileNameParent, imgParentSound), false, listDataSound))
+               listDataSound = mutableListOf()
+           }
         }
         return list
     }
@@ -253,8 +255,7 @@ object FileHandler {
             call(path, true)
             return
         }
-        Log.d("sdsadjalksdjasd",path)
-        val check1 = isFileExistsInAssets(path, context)
+         val check1 = isFileExistsInAssets(path, context)
 
         if (check1) {
             call(path, true)
@@ -277,7 +278,7 @@ object FileHandler {
         call(pathSound, false)
     }
 
-    private fun isFileExistsInAssets(filePath: String?, context: Context): Boolean {
+    private fun isFileExistsInAssets(filePath: String?, context: Context ): Boolean {
         val assetManager: AssetManager = context.assets
         return try {
             val inputStream = assetManager.open(filePath!!)

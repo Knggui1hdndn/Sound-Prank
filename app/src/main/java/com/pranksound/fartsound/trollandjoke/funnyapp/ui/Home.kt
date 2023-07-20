@@ -1,21 +1,29 @@
 package com.pranksound.fartsound.trollandjoke.funnyapp.ui
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.TypefaceSpan
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.forEach
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.access.pro.config.ConfigModel
 import com.pranksound.fartsound.trollandjoke.funnyapp.Constraints
 import com.pranksound.fartsound.trollandjoke.funnyapp.FileHandler
 import com.pranksound.fartsound.trollandjoke.funnyapp.R
@@ -24,6 +32,7 @@ import com.pranksound.fartsound.trollandjoke.funnyapp.broadcast.ListenNetwork
 import com.pranksound.fartsound.trollandjoke.funnyapp.broadcast.ListensChangeNetwork
 import com.pranksound.fartsound.trollandjoke.funnyapp.contract.ApiClientContract
 import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.ActivityHomeBinding
+import com.pranksound.fartsound.trollandjoke.funnyapp.databinding.DialogRateBinding
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataImage
 import com.pranksound.fartsound.trollandjoke.funnyapp.model.DataSound
 import com.pranksound.fartsound.trollandjoke.funnyapp.presenter.ApiClientPresenter
@@ -135,7 +144,8 @@ class Home : BaseActivity(), ApiClientContract.Listens, RecyclerView, ListenNetw
     }
 
 
-    override fun itemClick(triple: Triple<DataImage, Boolean, List<DataSound>>, position: Int) {0
+    override fun itemClick(triple: Triple<DataImage, Boolean, List<DataSound>>, position: Int) {
+
         try {
             listHash[position] = triple
             adapter.setData(listHash)
@@ -145,6 +155,11 @@ class Home : BaseActivity(), ApiClientContract.Listens, RecyclerView, ListenNetw
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_home, menu)
+        menu?.forEach {
+            if (it.itemId == R.id.subvip) {
+                it.isVisible = (!proApplication.isSubVip && ConfigModel.showSub)
+            }
+        }
         return true
     }
 
@@ -152,6 +167,7 @@ class Home : BaseActivity(), ApiClientContract.Listens, RecyclerView, ListenNetw
         when (item.itemId) {
             R.id.favourite -> startActivity(Intent(this, Favorite::class.java))
             R.id.setting -> startActivity(Intent(this, Setting::class.java))
+            R.id.subvip -> startActivity(Intent(this, SubVipActivity::class.java))
         }
 
         return true

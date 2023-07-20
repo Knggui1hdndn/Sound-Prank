@@ -36,6 +36,8 @@ class ShowPresenter(
     private var currentPosition = 0
     private var isDownload = false
     private var isLooping = false
+    private var isRepeatInterval = false
+    private var isStart = false
     private lateinit var itemDataSound: DataSound
     private var source: String = ""
     private lateinit var mDataImage: DataImage
@@ -86,7 +88,6 @@ class ShowPresenter(
         } else {
             setUpListConnected()
         }
-
     }
 
     private fun setUpListDisconnected() {
@@ -106,10 +107,19 @@ class ShowPresenter(
     private fun setUpListConnected() {
         apiClientPresenter.getListChildSound(mDataImage.id, object : ApiClientContract.Listens {
             override fun onSuccess(list: List<Any>) {
-                view.setAdapter(list as MutableList<DataSound>)
-                listSoundChild = list
+                val listsSound = list as MutableList<DataSound>
+                val list1 = FileHandler.getAllFileAsset(context)
+                val list11 =
+                    list1.filter { it.first.name.lowercase() == mDataImage.name.lowercase() }
+                if (list11.isNotEmpty()) {
+                    list11[0].third.forEachIndexed { i, o ->
+                        listsSound[i].source = o.source
+                    }
+                }
+                view.setAdapter(listsSound)
+                listSoundChild = listsSound
                 listSize = listSoundChild.size
-                (context as Show).onSuccess(list)
+                (context as Show).onSuccess(listsSound)
             }
 
             override fun onFailed(e: String) {
@@ -136,7 +146,10 @@ class ShowPresenter(
 
     override fun handlePageScrolled(position: Int) {
         view.onPagerScroll()
+        isRepeatInterval = false
         currentPosition = position
+        isLooping = false
+        isStart = false
         pauseMusic()
         setRepeatInterval(-1)
         if (listSoundChild.size > 0) {
@@ -287,7 +300,7 @@ class ShowPresenter(
 
     override fun setLooping(isLooping: Boolean) {
         this.isLooping = isLooping
-
+        if (isLooping && isStart) setRepeatInterval(0) else setRepeatInterval(-1)
     }
 
     override fun clickMenuPopup() {
@@ -307,6 +320,8 @@ class ShowPresenter(
                 0
             }
         }
+        if (mediaPlayer != null && mediaPlayer.isPlaying) mediaPlayer.stop()
+
         setRepeatInterval(repeatInterval)
     }
 
@@ -348,6 +363,7 @@ class ShowPresenter(
                 mediaPlayer.start()
                 view.loadSuccess()
             }
+
             mediaPlayer.setOnErrorListener { mp, what, _ ->
                 setError(what)
                 false
@@ -377,8 +393,8 @@ class ShowPresenter(
 
 
     override fun playMusic() {
+        isStart = true
         val pathSound = listSoundChild[currentPosition].source
-
         try {
             mediaPlayer.reset()
             val check = context.assets.openFd(pathSound)
@@ -414,11 +430,15 @@ class ShowPresenter(
     }
     private val handel = Handler(Looper.myLooper()!!)
     override fun setRepeatInterval(intervalSeconds: Int) {
-        if (intervalSeconds != -1) {
+        var _intervalSeconds = intervalSeconds
+        if (isLooping && isStart && _intervalSeconds>0) _intervalSeconds = 0
+        if (_intervalSeconds != -1 && isStart) {
+            isRepeatInterval = true
             handel.removeCallbacksAndMessages(null)
             handel.postDelayed(run, intervalSeconds.toLong())
             mediaPlayer.setOnCompletionListener {
-                if (intervalSeconds != -1) {
+                if (intervalSeconds != -1 && isLooping) {
+                    isRepeatInterval = true
                     handel.postDelayed(run, intervalSeconds.toLong())
                 }
             }
@@ -426,7 +446,7 @@ class ShowPresenter(
             }
         } else {
             handel.removeCallbacksAndMessages(null)
-            mediaPlayer.pause()
+            mediaPlayer.stop()
         }
     }
 }

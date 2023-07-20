@@ -46,6 +46,18 @@ class SubVipActivity : BaseActivity(), SubVipInterface.View {
             handler.postDelayed(this, 3000) // 3000 milliseconds (3 seconds) delay between scrolls
         }
     }
+    private val runnable1: Runnable = object : Runnable {
+        override fun run() {
+            val currentItem: Int = binding.viewPager.getCurrentItem()
+            val count: Int = 4
+            if (currentItem < count - 1) {
+                binding.viewPager.setCurrentItem(currentItem + 1, true)
+            } else {
+                binding.viewPager.setCurrentItem(0, true)
+            }
+            handler.postDelayed(this, 3000) // 3000 milliseconds (3 seconds) delay between scrolls
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,12 +120,8 @@ class SubVipActivity : BaseActivity(), SubVipInterface.View {
                 showPurchaseDialog()
             }
             close.setOnClickListener {
-                if (intent.getStringExtra("activity") == "setting") {
-                    finish()
-                } else {
-                    finish()
-
-                }
+                finish()
+                startActivity(Intent(this@SubVipActivity, Home::class.java))
             }
             restore.setOnClickListener {
                 this@SubVipActivity.restore = true
@@ -147,11 +155,14 @@ class SubVipActivity : BaseActivity(), SubVipInterface.View {
     override fun onPause() {
         super.onPause()
         handler.removeCallbacks(runnable);
+        handler.removeCallbacks(runnable1);
 
     }
+
     override fun onResume() {
         super.onResume()
         handler.postDelayed(runnable, 3000) // 3000 milliseconds (3 seconds) initial delay
+        handler.postDelayed(runnable1, 3000) // 3000 milliseconds (3 seconds) initial delay
     }
 
     override fun setBackGroundDefault(draw: Int) {
@@ -195,6 +206,8 @@ class SubVipActivity : BaseActivity(), SubVipInterface.View {
     }
 
     override fun handelClick(position: Int) {
+        Log.d("ppppppppppppppp",ConfigModel.subDefaultPack+position)
+
         setBackGroundDefault(R.drawable.boder_buy_unclick)
         setBackGroundClick(R.drawable.border_buy_click, position)
         setTextColorDefault(R.color.clickSub)
@@ -294,7 +307,6 @@ class SubVipActivity : BaseActivity(), SubVipInterface.View {
         subWeekProduct = getPurchasesProductDetail("pack_sub_week", BillingClient.ProductType.SUBS)
         lifeTimeProduct =
             getPurchasesProductDetail("pack_life_time", BillingClient.ProductType.INAPP)
-        currentProduct = subWeekProduct
         when (ConfigModel.subDefaultPack) {
             "pack_sub_week" -> {
                 currentProduct = subWeekProduct
@@ -322,9 +334,7 @@ class SubVipActivity : BaseActivity(), SubVipInterface.View {
             var product = subMonthProduct!!.subscriptionOfferDetails!!.first()
             var pricingPhase = product.pricingPhases.pricingPhaseList
             if (pricingPhase.size > 1) {
-                binding.txtPriceMonth.text = "Then\n".plus(
-                    product.pricingPhases.pricingPhaseList[1].formattedPrice
-                ).plus("/month")
+                binding.txtPriceMonth.text = "Then\n".plus(product.pricingPhases.pricingPhaseList[1].formattedPrice ).plus("/month")
                 binding.txtMonth.text =
                     product.pricingPhases.pricingPhaseList[0].formattedPrice.plus("\nFor 3 Day")
             } else if (pricingPhase.isNotEmpty()) {
@@ -362,10 +372,10 @@ class SubVipActivity : BaseActivity(), SubVipInterface.View {
         binding.description.text =
             getString(R.string.billing_starts)
                 .plus(" ")
-                .plus(binding.txtWeek.text.toString().replace("Then ", ""))
-                .plus("/week or ")
+                .plus(binding.txtPriceWeek.text.toString().replace("Then ", ""))
+                .plus(" or ")
                 .plus(binding.txtPriceMonth.text.toString().replace("Then ", ""))
-                .plus("/month or ")
+                .plus(" or ")
                 .plus(binding.txtPriceLifeTime.text.toString().replace("Then ", ""))
                 .plus(" for LifeTime. ")
                 .plus(getString(R.string.billing_end))

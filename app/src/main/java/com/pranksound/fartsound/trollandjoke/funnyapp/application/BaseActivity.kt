@@ -118,10 +118,7 @@ open class BaseActivity : com.access.pro.activity.BaseActivity() {
                     ConfigModel.timeInter = remoteConfig["time_inter"].asLong().toInt()
                     ConfigModel.forceUpdate = remoteConfig["force_update"].asBoolean()
                     ConfigModel.showSub = remoteConfig["show_sub"].asBoolean()
-                    Log.d(
-                        "sssssssssssssssssssssssa",
-                        remoteConfig["show_sub"].asBoolean().toString()
-                    )
+                    ConfigModel.subDefaultPack = remoteConfig["sub_default_pack"].asString()
                     ConfigModel.showCloseButton = remoteConfig["show_close_button"].asBoolean()
                     ConfigModel.forceUpdateVer =
                         remoteConfig["force_update_vercode"].asLong()

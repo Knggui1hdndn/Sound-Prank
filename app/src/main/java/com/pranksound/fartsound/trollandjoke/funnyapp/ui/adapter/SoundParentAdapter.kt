@@ -47,7 +47,7 @@ class SoundParentAdapter(
 
         fun bind(triple: Triple<DataImage, Boolean, List<DataSound>>, position: Int) {
             val mDataImage = triple.first
-            isChecked = triple.second
+             isChecked = triple.second
             val listDataSound = triple.third
             this.mDataImage = mDataImage
             with(binding) {

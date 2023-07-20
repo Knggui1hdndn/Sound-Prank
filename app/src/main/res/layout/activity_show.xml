@@ -73,7 +73,7 @@
             android:layout_marginEnd="40dp"
             android:layout_marginBottom="40dp"
             app:cardCornerRadius="35dp"
-            app:layout_constraintBottom_toTopOf="@+id/btnTime"
+            app:layout_constraintBottom_toTopOf="@+id/mLinear"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent">
@@ -95,11 +95,13 @@
                     app:layout_constraintEnd_toStartOf="@+id/imgNext"
                     app:layout_constraintStart_toEndOf="@+id/imgPre"
                     app:layout_constraintTop_toTopOf="parent">
+
                     <ImageView
                         android:id="@+id/img"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         tools:ignore="MissingConstraints" />
+
                     <ProgressBar
                         android:id="@+id/mProgress"
                         android:layout_width="wrap_content"
@@ -137,79 +139,115 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <ImageView
-            android:id="@+id/imgDowload"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="40dp"
 
-            android:background="@drawable/download_24px"
+
+
+
+        <LinearLayout
+            android:layout_marginBottom="15dp"
+            android:id="@+id/mLinear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="10"
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
-            app:layout_constraintEnd_toEndOf="parent" />
+            tools:ignore="MissingConstraints">
 
-        <ProgressBar
-            android:id="@+id/mProgress1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2.5"
+                android:gravity="center">
 
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/btnTime"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:src="@drawable/time" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtTime"
+                    android:layout_marginStart="5dp"
+                    android:text="15s"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2.5"
+                android:gravity="center"
+                >
+
+                <CheckBox
+                    android:id="@+id/cbFavourite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_favorite"
+
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+
+                android:layout_height="match_parent"
+                android:layout_weight="2.5"
+                android:gravity="center">
+
+                <CheckBox
+                    android:button="@drawable/loop"
+                    android:id="@+id/cbLoop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+
+                android:layout_height="match_parent"
+                android:layout_weight="2.5"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/imgDowload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/download_24px" />
+            </LinearLayout>
 
 
-        <ImageView
-            android:id="@+id/btnTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="40dp"
-            android:background="@drawable/time"
-            app:layout_constraintBottom_toTopOf="@+id/seekBar"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <CheckBox
-            android:id="@+id/cbFavourite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:button="@drawable/checkbox_favorite"
-
-            app:layout_constraintBottom_toTopOf="@+id/seekBar"
-            app:layout_constraintEnd_toStartOf="@+id/cbLoop"
-            app:layout_constraintStart_toEndOf="@+id/btnTime" />
-
-        <CheckBox
-            android:id="@+id/cbLoop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:button="@drawable/checkbox_loop"
-            app:layout_constraintBottom_toTopOf="@+id/seekBar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.635"
-            app:layout_constraintStart_toEndOf="@+id/btnTime"
-            app:layout_constraintVertical_bias="0.0"
-            tools:ignore="UseSwitchCompatOrMaterialXml" />
+        </LinearLayout>
 
         <SeekBar
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="15dp"
-            android:minWidth="15dp"
-            android:maxHeight="15dp"
-            android:maxWidth="15dp"
             android:layout_marginBottom="10dp"
+            android:maxWidth="15dp"
+            android:maxHeight="15dp"
+            android:minWidth="15dp"
+            android:minHeight="15dp"
             android:progress="50"
-            android:splitTrack="false"
             android:progressDrawable="@drawable/custom_seekbar"
+            android:splitTrack="false"
             android:thumb="@drawable/custom_thumb"
             app:layout_constraintBottom_toBottomOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <ProgressBar
+        android:id="@+id/mProgress1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
