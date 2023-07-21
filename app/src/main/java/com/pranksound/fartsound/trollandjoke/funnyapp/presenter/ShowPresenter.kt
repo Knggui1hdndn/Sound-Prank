@@ -46,6 +46,7 @@ class ShowPresenter(
     private lateinit var intent: Intent
     private var listSize: Int = 0
     private var checkNetWork = false
+    private var repeatInterval = 0
     var listName = arrayListOf<String>()
     fun setUpActivity(intent: Intent) {
         checkNetWork = ListensChangeNetwork.isConnectNetwork == Constraints.CONNECTION_NETWORK
@@ -146,10 +147,12 @@ class ShowPresenter(
 
     override fun handlePageScrolled(position: Int) {
         view.onPagerScroll()
+        repeatInterval=-1
         isRepeatInterval = false
         currentPosition = position
         isLooping = false
         isStart = false
+        handel.removeCallbacks(run)
         pauseMusic()
         setRepeatInterval(-1)
         if (listSoundChild.size > 0) {
@@ -300,7 +303,10 @@ class ShowPresenter(
 
     override fun setLooping(isLooping: Boolean) {
         this.isLooping = isLooping
-        if (isLooping && isStart) setRepeatInterval(0) else setRepeatInterval(-1)
+        if (isLooping && repeatInterval>0){
+            setRepeatInterval(repeatInterval)
+        }else  {handel.removeCallbacks(run)}
+        Log.e("sssssssssssssssss",this.isLooping.toString())
     }
 
     override fun clickMenuPopup() {
@@ -320,9 +326,10 @@ class ShowPresenter(
                 0
             }
         }
-        if (mediaPlayer != null && mediaPlayer.isPlaying) mediaPlayer.stop()
-
-        setRepeatInterval(repeatInterval)
+        if (mediaPlayer.isPlaying) mediaPlayer.stop()
+        this.repeatInterval = repeatInterval
+        handel.removeCallbacks(run)
+        setRepeatInterval(this.repeatInterval)
     }
 
     override fun nextItem() {
@@ -346,13 +353,17 @@ class ShowPresenter(
     override fun getMaxVolume(): Int {
         return audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
     }
+fun remove(){
+    handel.removeCallbacks(run)
+}
+
 
     val h = Handler(Looper.myLooper()!!)
     override fun playMusicOnl(url: String) {
         h.removeCallbacksAndMessages(null)
         h.postDelayed({
             if (!mediaPlayer.isPlaying) view.loadFailed("Error loading")
-        }, 2000)
+        }, 3000)
         try {
             if (mediaPlayer.isPlaying) mediaPlayer.pause()
             view.load()
@@ -382,10 +393,7 @@ class ShowPresenter(
         mediaPlayer.setDataSource(raw)
         mediaPlayer.prepare()
         mediaPlayer.start()
-        mediaPlayer.setOnCompletionListener {
 
-
-        }
         mediaPlayer.setOnCompletionListener {
 
         }
@@ -393,6 +401,45 @@ class ShowPresenter(
 
 
     override fun playMusic() {
+        if (repeatInterval > 0) {
+            play()
+        } else {
+            setRepeatInterval(0)
+        }
+    }
+
+    override fun getCurrentVolume(): Int {
+        return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+    }
+
+    override fun pauseMusic() {
+        mediaPlayer.stop()
+        remove()
+    }
+
+    override fun adjustVolume(volume: Int) {
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+    }
+
+    override fun setFavorite(isFavorite: Boolean) {
+
+    }
+var time=0L
+    private val run = object : Runnable {
+        override fun run() {
+            time=System.currentTimeMillis()-time
+            Log.e("////////////////",repeatInterval.toString()+"timetimetimetimetimetimetime"+time)
+            play()
+            mediaPlayer.setOnCompletionListener {
+                Log.e("////////////////",repeatInterval.toLong().toString())
+                handel.removeCallbacks(this)
+                if (isLooping && isStart) handel.postDelayed(this, repeatInterval.toLong()) else handel.removeCallbacks(this)
+                time=System.currentTimeMillis()
+            }
+        }
+    }
+
+    private fun play() {
         isStart = true
         val pathSound = listSoundChild[currentPosition].source
         try {
@@ -405,48 +452,13 @@ class ShowPresenter(
 
     }
 
-    override fun getCurrentVolume(): Int {
-        return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-    }
-
-    override fun pauseMusic() {
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.pause()
-
-        }
-    }
-
-    override fun adjustVolume(volume: Int) {
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
-    }
-
-    override fun setFavorite(isFavorite: Boolean) {
-
-    }
-
-    private val run = Runnable {
-        playMusic()
-
-    }
-    private val handel = Handler(Looper.myLooper()!!)
+    private val handel = Handler(Looper.getMainLooper()!!)
     override fun setRepeatInterval(intervalSeconds: Int) {
-        var _intervalSeconds = intervalSeconds
-        if (isLooping && isStart && _intervalSeconds>0) _intervalSeconds = 0
-        if (_intervalSeconds != -1 && isStart) {
-            isRepeatInterval = true
-            handel.removeCallbacksAndMessages(null)
-            handel.postDelayed(run, intervalSeconds.toLong())
-            mediaPlayer.setOnCompletionListener {
-                if (intervalSeconds != -1 && isLooping) {
-                    isRepeatInterval = true
-                    handel.postDelayed(run, intervalSeconds.toLong())
-                }
-            }
-            mediaPlayer.setOnSeekCompleteListener {
-            }
-        } else {
-            handel.removeCallbacksAndMessages(null)
-            mediaPlayer.stop()
+        if (intervalSeconds == 0) {
+            handel.postDelayed(run, repeatInterval.toLong())
+        }
+        if (intervalSeconds > 0) {
+            handel.postDelayed(run, repeatInterval.toLong())
         }
     }
 }

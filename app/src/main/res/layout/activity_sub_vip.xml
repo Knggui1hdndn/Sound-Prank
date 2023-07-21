@@ -633,7 +633,7 @@
                     <RelativeLayout
                         android:id="@+id/mLinearMonth"
                         android:layout_width="0dp"
-                        android:layout_height="115dp"
+                        android:layout_height="120dp"
                         android:layout_marginRight="5dp"
                         android:layout_weight="3"
                         android:background="@drawable/border_buy_click"
@@ -662,6 +662,7 @@
                                 android:id="@+id/txtPriceMonth"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:gravity="top"
                                 android:text="Tiền"
                                 android:textColor="#654164"
                                 android:textSize="13sp"
@@ -733,6 +734,14 @@
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:textStyle="normal"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_below="@id/txtLifeTime"
+                            android:text="Never miss out on new updates"
+                            android:textColor="#654164" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
